@@ -1,5 +1,6 @@
 function dataController() {
     const dataSchema = require('../models/dataSchema');
+    const dataService = require('../services/dataService');
 
     this.createData = (req, res) => {
         const project = req.body.project;
@@ -21,7 +22,7 @@ function dataController() {
     };
 
     this.getAllData = (req, res) => {
-        dataSchema.find({}, (err, data) => {
+        dataService.getAll((err, data) => {
             if (err) {
                 console.log(err);
                 res.send({ error: err });
