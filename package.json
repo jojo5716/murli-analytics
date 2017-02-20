@@ -1,0 +1,15 @@
+{
+  "name": "murli-analytics",
+  "version": "1.0.0",
+  "description": "Backend service to visitor-guest",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jonathan Rodríguez Alejos",
+  "license": "ISC",
+  "dependencies": {
+    "mongoose": "^4.8.4",
+    "restify": "^4.3.0"
+  }
+}
