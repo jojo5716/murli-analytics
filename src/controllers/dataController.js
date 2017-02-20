@@ -1,15 +1,13 @@
 function dataController() {
     const dataSchema = require('../models/dataSchema');
-    this.createData = (req, res) => {
-        let data;
-        try {
-            data = JSON.parse(req.body);
-        } catch(err) {
-            data = null;
-        }
 
-        if (data) {
-            dataSchema.create({ data }, (err, result) => {
+    this.createData = (req, res) => {
+        const project = req.body.project;
+        const data = JSON.parse(req.body.data || null);
+
+        if (data && project) {
+
+            dataSchema.create({ data, project }, (err, result) => {
                 if (err) {
                     console.log(err);
                     return res.send({ error: err });
@@ -21,6 +19,18 @@ function dataController() {
             return res.send({ error: true });
         }
     };
+
+    this.getAllData = (req, res) => {
+        dataSchema.find({}, (err, data) => {
+            if (err) {
+                console.log(err);
+                res.send({ error: err });
+            } else {
+                res.send({ data });
+            }
+        });
+    };
+    return this;
 }
 
 module.exports = new dataController();

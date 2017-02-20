@@ -3,6 +3,7 @@ module.exports = (function dataSchema() {
 
     const dataModel = {
         data: { type: Object, required: true },
+        project: { type: mongoose.Schema.Types.ObjectId, ref: 'Project' },
         createAt: { type: Date, default: Date.now }
     };
 
