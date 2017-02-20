@@ -10,6 +10,16 @@ function getAll(callback) {
     });
 }
 
+function getById(id, callback) {
+    projectSchema.findOne({_id: id }, (err, project) => {
+        if (err) {
+            callback({ error: err });
+        } else {
+            callback(null, project);
+        }
+    });
+}
 module.exports = {
-    getAll
+    getAll,
+    getById
 };
