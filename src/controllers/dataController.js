@@ -4,15 +4,14 @@ function dataController() {
     const projectService = require('../services/projectService');
 
     this.createData = (req, res) => {
-        const projectID = req.body.project;
-        const data = JSON.parse(req.body.data || null);
+        const data = JSON.parse(req.body || null);
 
-        projectService.getById(projectID, (projectErr, project) => {
+        projectService.getById(data.project, (projectErr, project) => {
             if (projectErr || !project) {
                 console.log(projectErr);
                 res.send({ error: projectErr });
             } else {
-                dataSchema.create({ data, project }, (err, result) => {
+                dataSchema.create({ data: data.data, project: project }, (err, result) => {
                     if (err) {
                         console.log(err);
                         return res.send({ error: err });
