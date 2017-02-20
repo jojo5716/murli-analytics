@@ -7,9 +7,12 @@ app.use(restify.fullResponse());
 app.use(restify.bodyParser());
 app.use(restify.queryParser());
 
+app.use(restify.CORS({
+    credentials: true
+}));
+
 app.listen(config.port, () => {
     console.log('server listening on port number', config.port);
-
 });
 
 const routes = require('./routes')(app);

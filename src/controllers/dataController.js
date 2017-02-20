@@ -3,7 +3,7 @@ function dataController() {
     this.createData = (req, res) => {
         let data;
         try {
-            data = JSON.parse(req.params.data);
+            data = JSON.parse(req.body);
         } catch(err) {
             data = null;
         }
