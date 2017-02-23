@@ -12,7 +12,14 @@ function getUserOrCreate(data, resolve, reject) {
         if (user) {
             resolve(user);
         } else {
-            userService.create(data, (error, user) => {
+            const userInfo = {
+                dataUser: data.data.enviroment[0],
+                session: data.data.session
+            };
+            const extraData = mergeUserInfo(data.data.userInfo);
+            const mergedInfo = Object.assign(userInfo, extraData);
+
+            userService.create(mergedInfo, (error, user) => {
                 if (error) {
                     reject(error);
                 } else {
@@ -48,7 +55,14 @@ function createPage(data, user) {
     }, () => {});
 }
 
-
+function mergeUserInfo(userInfo) {
+    const info = {};
+    for (const key in userInfo) {
+        const userData = userInfo[key];
+        info[userData.key] = userData.value;
+    }
+    return info;
+}
 function mergePageInfo(data) {
     const pageInfo = data.data.page[0];
     const leavesAt = data.data.leaveAt;
@@ -85,7 +99,6 @@ function userController() {
 
     this.createUser = (req, res) => {
         const data = JSON.parse(req.body || null);
-
         // Getting project
         const projectPromise = new Promise(getProject.bind(this, data.project)).then(project => {
             // Getting or create user
