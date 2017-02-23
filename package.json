@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "mongoose": "^4.8.4",
+    "promise": "^7.1.1",
     "restify": "^4.3.0",
     "uuid": "^3.0.1"
   },
