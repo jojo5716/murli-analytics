@@ -9,6 +9,7 @@ module.exports = (function userSchema() {
         latitude: { type: String, required: false },
         longitude: { type: String, required: false },
         lang: { type: String, required: false },
+        bookings: { type: Array, default: [] },
         dataUser: { type: Object },
         createAt: { type: Date, default: Date.now }
     };

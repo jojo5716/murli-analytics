@@ -5,13 +5,28 @@ const pageService = require('../services/pageService');
 const userService = require('../services/userService');
 const projectService = require('../services/projectService');
 
+function updateUserInfo(user, bookingInfo) {
+    const booking = {};
+
+    if (bookingInfo.length > 0) {
+        for (const key in bookingInfo) {
+            const bookingData = bookingInfo[key];
+            booking[bookingData.key] = bookingData.value;
+        }
+        user.bookings.push(booking);
+        user.save(() => {});
+    }
+}
+
 function getUserOrCreate(data, resolve, reject) {
     userService.getBySession(data.data.session, (err, user) => {
         if (err) reject(err);
 
         if (user) {
+            updateUserInfo(user, data.data.booking);
             resolve(user);
         } else {
+            updateUserInfo(user, data.data.booking);
             const userInfo = {
                 dataUser: data.data.enviroment[0],
                 session: data.data.session
