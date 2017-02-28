@@ -7,8 +7,8 @@ module.exports = function(app) {
         res.send('Hello World')
     );
 
-    app.post('/data', userController.createUser);
-    app.get('/data', userController.getAllData);
+    app.post('/user', userController.createUser);
+    app.get('/users', userController.getAllData);
 
     app.post('/project', projectController.createProject);
     app.get('/projects', projectController.getProjects);

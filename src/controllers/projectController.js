@@ -22,7 +22,7 @@ function projectController() {
                 console.log(err);
                 return res.send({ error: err });
             } else {
-                return res.send({ projects });
+                return res.json({ projects });
             }
         });
     };

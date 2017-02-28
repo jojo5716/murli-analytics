@@ -5,7 +5,7 @@ function getAll(callback) {
         if (err) {
             callback({ error: err }, null);
         } else {
-            callback(null, { projects });
+            callback(null, projects);
         }
     });
 }

@@ -11,11 +11,11 @@ function create(args, callback) {
 }
 
 function getAll(callback) {
-    pageSchema.find({}, (err, data) => {
+    pageSchema.find({}, (err, pages) => {
         if (err) {
             callback({ error: err }, null);
         } else {
-            callback(null, { data });
+            callback(null, pages);
         }
     });
 }

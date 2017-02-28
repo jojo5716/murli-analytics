@@ -144,7 +144,7 @@ function userController() {
                 console.log(err);
                 res.send({ error: err });
             } else {
-                res.send({ users });
+                res.json({ users });
             }
         });
     };
