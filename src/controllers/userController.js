@@ -72,12 +72,14 @@ function createPage(data, user) {
 
 function mergeUserInfo(userInfo) {
     const info = {};
+
     for (const key in userInfo) {
         const userData = userInfo[key];
         info[userData.key] = userData.value;
     }
     return info;
 }
+
 function mergePageInfo(data) {
     const pageInfo = data.data.page[0];
     const leavesAt = data.data.leaveAt;
@@ -86,6 +88,7 @@ function mergePageInfo(data) {
     const pageInfoCloned = Object.assign({}, pageInfo);
 
     pageInfoCloned.leavesAt = leavesAt;
+    pageInfoCloned.loadedOn = new Date().getTime();
 
     if (!pageInfoCloned.metaData) {
         pageInfoCloned.metaData = [];
@@ -105,6 +108,7 @@ function mergePageInfo(data) {
 
     return pageInfoCloned;
 }
+
 function updatePage(page, data) {
     page.pages.push(mergePageInfo(data));
     page.save(() => {});

@@ -4,7 +4,6 @@ function projectController() {
 
     this.createProject = (req, res) => {
         let name = req.body.name;
-
         projectSchema.create({ name }, (err, result) => {
             if (err) {
                 console.log(err);
