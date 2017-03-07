@@ -14,4 +14,5 @@ module.exports = function(app) {
     app.get('/projects', projectController.getProjects);
 
     app.get('/pages', pageController.getAllData);
+    app.post('/actions', pageController.saveAction);
 };

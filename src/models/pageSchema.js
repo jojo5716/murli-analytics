@@ -2,10 +2,14 @@ module.exports = (function pageSchema() {
     const mongoose = require('../database').mongoose;
 
     const pageModel = {
-        sessionTemp: { type: String, required: true },
-        user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-        pages: { type: Array, default: [] },
-        createAt: { type: Date, default: Date.now }
+        createAt: { type: Date, default: Date.now },
+        url: { type: String, required: true },
+        previousURL: { type: String, required: false },
+        leavesAt: { type: Number, required: false },
+        loadedOn: { type: Number, required: false },
+        pageToken: { type: String, required: true },
+        metaData: { type: Array, default: [] },
+        actions: { type: Array, default: [] }
     };
 
     const collectionName = 'Page';

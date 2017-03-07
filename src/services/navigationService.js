@@ -1,18 +1,17 @@
-const pageSchema = require('../models/pageSchema');
+const navigationSchema = require('../models/navigationSchema');
 
-
-function create(args, resolve, reject) {
-    pageSchema.create(args, (err, page) => {
+function create(args, callback) {
+    navigationSchema.create(args, (err, page) => {
         if (err) {
-            reject(err, null);
+            callback(err, null);
         } else {
-            resolve(null, page);
+            callback(null, page);
         }
     });
 }
 
 function getAll(callback) {
-    pageSchema.find({}, (err, pages) => {
+    navigationSchema.find({}, (err, pages) => {
         if (err) {
             callback({ error: err }, null);
         } else {
@@ -21,8 +20,8 @@ function getAll(callback) {
     });
 }
 
-function getByToken(pageToken, callback) {
-    pageSchema.findOne({ pageToken }, (err, page) => {
+function getBySession(sessionTemp, callback) {
+    navigationSchema.findOne({ sessionTemp }, (err, page) => {
         if (err) {
             callback({ error: err }, null);
         } else {
@@ -34,5 +33,5 @@ function getByToken(pageToken, callback) {
 module.exports = {
     create,
     getAll,
-    getByToken
+    getBySession
 };
