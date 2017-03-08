@@ -17,29 +17,15 @@ function pageController() {
     this.saveAction = (req, res) => {
         const data = JSON.parse(req.body);
 
-        pageService.getBySession(data.data.sessionTemp, (err, page) => {
-            if (err || !page) {
-                res.json({ success: false, error: err });
+        pageService.getByToken(data.data.pageToken, (error, page) => {
+            if (error || !page) {
+                res.json({ error });
             } else {
-
-                const currentPage = page.pages.map((pag) => {
-                    if (pag.pageToken === data.data.pageToken) {
-                        return pag;
-                    }
-                });
-
-                if (currentPage && currentPage.length === 1) {
-                    currentPage[0].actions.push(data.data.actions);
-
-                    const promise = page.save();
-
-                    promise.then((actions) => {
-                        console.log("Saved");
-                        console.log(actions);
-                    });
-
-                    res.json({ success: true });
+                for (let i = 0; i < data.data.actions.length; i += 1) {
+                    page.actions.push(data.data.actions[i]);
                 }
+                page.save(() => {});
+                res.json({ success: true });
             }
         });
     };
