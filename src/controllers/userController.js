@@ -35,7 +35,7 @@ function userController() {
         });
     };
 
-    this.getAllData = (req, res) => {
+    this.getAll = (req, res) => {
         userService.getAll((err, users) => {
             if (err) {
                 console.log(err);

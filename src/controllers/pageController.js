@@ -3,7 +3,7 @@ const pageService = require('../services/pageService');
 
 function pageController() {
 
-    this.getAllData = (req, res) => {
+    this.getAll = (req, res) => {
         pageService.getAll((err, pages) => {
             if (err) {
                 console.log(err);

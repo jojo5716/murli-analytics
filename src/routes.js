@@ -8,11 +8,11 @@ module.exports = function(app) {
     );
 
     app.post('/user', userController.createUser);
-    app.get('/users', userController.getAllData);
+    app.get('/users', userController.getAll);
 
     app.post('/project', projectController.createProject);
     app.get('/projects', projectController.getProjects);
 
-    app.get('/pages', pageController.getAllData);
+    app.get('/pages', pageController.getAll);
     app.post('/actions', pageController.saveAction);
 };

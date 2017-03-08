@@ -23,7 +23,6 @@ function createNavigation(data, user) {
             console.log(navigation);
         });
     });
-
 }
 
 function createPage(data, resolve, reject) {
