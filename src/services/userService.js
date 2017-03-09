@@ -40,6 +40,7 @@ function getByCreate(dateFrom, dateTo, callback) {
     });
 }
 
+
 module.exports = {
     create,
     getAll,

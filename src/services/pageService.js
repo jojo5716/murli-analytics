@@ -1,4 +1,5 @@
 const pageSchema = require('../models/pageSchema');
+const navigationSchema = require('../models/navigationSchema');
 
 
 function create(args, callback) {
@@ -31,8 +32,25 @@ function getByToken(pageToken, callback) {
     });
 }
 
+function getByCreate(dateFrom, dateTo, callback) {
+    navigationSchema.find(
+        {
+            createAt: {
+                $gte: dateFrom,
+                $lte: dateTo
+            }
+        }).populate(['pages', 'user']).exec((err, user) => {
+            if (err) {
+                callback({ error: err });
+            } else {
+                callback(null, user);
+            }
+        });
+}
+
 module.exports = {
     create,
     getAll,
-    getByToken
+    getByToken,
+    getByCreate
 };

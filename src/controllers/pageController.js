@@ -46,6 +46,7 @@ function pageController() {
 
     this.saveAction = (req, res) => {
         const data = JSON.parse(req.body);
+
         pageService.getByToken(data.data.pageToken, (error, page) => {
             if (error || !page) {
                 res.json({ error });
@@ -55,6 +56,20 @@ function pageController() {
                 }
                 page.save(() => {});
                 res.json({ success: true });
+            }
+        });
+    };
+
+    this.getByCreate = (req, res) => {
+        const dateFrom = new Date(req.params.dateFrom);
+        const dateTo = new Date(req.params.dateTo);
+
+        pageService.getByCreate(dateFrom, dateTo, (err, users) => {
+            if (err) {
+                console.log(err);
+                res.send({ error: err });
+            } else {
+                res.json({ users });
             }
         });
     };

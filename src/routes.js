@@ -8,12 +8,15 @@ module.exports = function(app) {
     );
 
     app.get('/users', userController.getAll);
-    app.get('/users/date/between/:dateFrom/:dateTo', userController.getByCreate);
+    app.get('/users/date/createAt/:dateFrom/:dateTo', userController.getByCreate);
 
     app.get('/projects', projectController.getProjects);
     app.post('/project', projectController.createProject);
 
     app.get('/pages', pageController.getAll);
+    app.get('/pages/createAt/:dateFrom/:dateTo', pageController.getByCreate);
+
+
     app.post('/actions', pageController.saveAction);
     app.post('/track', pageController.trackPage);
 
