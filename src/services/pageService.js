@@ -39,11 +39,14 @@ function getByCreate(dateFrom, dateTo, callback) {
                 $gte: dateFrom,
                 $lte: dateTo
             }
-        }).populate(['pages', 'user']).exec((err, user) => {
+        })
+        .populate(['pages', 'user'])
+        .sort({ createAt: 1 })
+        .exec((err, navigationPages) => {
             if (err) {
                 callback({ error: err });
             } else {
-                callback(null, user);
+                callback(null, navigationPages);
             }
         });
 }

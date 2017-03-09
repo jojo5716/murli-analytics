@@ -64,12 +64,12 @@ function pageController() {
         const dateFrom = new Date(req.params.dateFrom);
         const dateTo = new Date(req.params.dateTo);
 
-        pageService.getByCreate(dateFrom, dateTo, (err, users) => {
+        pageService.getByCreate(dateFrom, dateTo, (err, navigationPages) => {
             if (err) {
                 console.log(err);
                 res.send({ error: err });
             } else {
-                res.json({ users });
+                res.json({ navigationPages });
             }
         });
     };
