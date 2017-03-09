@@ -1,12 +1,12 @@
 const pageSchema = require('../models/pageSchema');
 
 
-function create(args, resolve, reject) {
+function create(args, callback) {
     pageSchema.create(args, (err, page) => {
         if (err) {
-            reject(err, null);
+            callback(err, null);
         } else {
-            resolve(null, page);
+            callback(null, page);
         }
     });
 }

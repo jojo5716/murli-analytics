@@ -8,6 +8,7 @@ module.exports = function(app) {
     );
 
     app.get('/users', userController.getAll);
+    app.get('/users/date/between/:dateFrom/:dateTo', userController.getByCreate);
 
     app.get('/projects', projectController.getProjects);
     app.post('/project', projectController.createProject);

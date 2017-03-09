@@ -46,7 +46,6 @@ function pageController() {
 
     this.saveAction = (req, res) => {
         const data = JSON.parse(req.body);
-
         pageService.getByToken(data.data.pageToken, (error, page) => {
             if (error || !page) {
                 res.json({ error });
