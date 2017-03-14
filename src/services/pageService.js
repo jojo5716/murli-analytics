@@ -32,9 +32,10 @@ function getByToken(pageToken, callback) {
     });
 }
 
-function getByCreate(dateFrom, dateTo, callback) {
+function getByCreate(dateFrom, dateTo, project, callback) {
     navigationSchema.find(
         {
+            project,
             createAt: {
                 $gte: dateFrom,
                 $lte: dateTo

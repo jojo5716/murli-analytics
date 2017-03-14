@@ -3,7 +3,7 @@ const Promise = require('promise');
 const pageService = require('../services/pageService');
 const { getProject } = require('../helpers/project');
 const { getUserOrCreate } = require('../helpers/user');
-const { getNavigation, createNavigation, updatePage } = require('../helpers/page');
+const { getNavigationByProject, createNavigation, updatePage } = require('../helpers/page');
 
 function pageController() {
 
@@ -25,16 +25,17 @@ function pageController() {
             // Getting or create user
             const userPromise = new Promise(getUserOrCreate.bind(this, data)).then(user => {
                 // Getting page
-                const navigationPromise = new Promise(getNavigation.bind(this, data)).then(navigation => {
+                const navigationPromise = new Promise(getNavigationByProject.bind(this, project)).then(navigation => {
                     if (!navigation) {
-                        createNavigation(data, user);
+                        createNavigation(data, user, project);
                     } else {
-                        // If we can a page we update with the new info.
+                        // If we can a page we update with the new page info.
                         updatePage(navigation, data);
                     }
                     return res.send({ success: true });
                 }).catch(err => {
-                    console.log(`NAVIGATION PROMISE ERROR: ${err}`);
+                    console.log(`NAVIGATION PROMISE ERROR`);
+                    console.log(err);
                 });
             }).catch(err => {
                 console.log(`USER PROMISE ERROR: ${err}`);
@@ -61,10 +62,14 @@ function pageController() {
     };
 
     this.getByCreate = (req, res) => {
-        const dateFrom = new Date(req.params.dateFrom);
-        const dateTo = new Date(req.params.dateTo);
+        let dateFrom = req.params.dateFrom;
+        let dateTo = req.params.dateTo;
+        let project = req.params.project;
 
-        pageService.getByCreate(dateFrom, dateTo, (err, navigationPages) => {
+        dateFrom = new Date(`${dateFrom}T00:00:00.000Z`);
+        dateTo = new Date(`${dateTo}T23:59:59.599Z`);
+
+        pageService.getByCreate(dateFrom, dateTo, project, (err, navigationPages) => {
             if (err) {
                 console.log(err);
                 res.send({ error: err });

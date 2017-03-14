@@ -14,7 +14,7 @@ module.exports = function(app) {
     app.post('/project', projectController.createProject);
 
     app.get('/pages', pageController.getAll);
-    app.get('/pages/createAt/:dateFrom/:dateTo', pageController.getByCreate);
+    app.get('/pages/createAt/:dateFrom/:dateTo/:project', pageController.getByCreate);
 
 
     app.post('/actions', pageController.saveAction);

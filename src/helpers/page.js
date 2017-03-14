@@ -2,26 +2,33 @@ const navigationService = require('../services/navigationService');
 const pageService = require('../services/pageService');
 
 
-function getNavigation(data, resolve, reject) {
-    navigationService.getBySession(data.data.sessionTemp, (err, page) => {
+function getNavigation(sessionTemp, resolve, reject) {
+    navigationService.getBySession(sessionTemp, (err, page) => {
         if (err) reject(err);
 
         resolve(page);
     });
 }
 
-function createNavigation(data, user) {
+function getNavigationByProject(project, resolve, reject) {
+
+    navigationService.getByProject(project, (err, page) => {
+        if (err) reject(err);
+
+        resolve(page);
+    });
+}
+
+function createNavigation(data, user, project) {
     const pageData = mergePageInfo(data);
 
     new Promise(createPage.bind(this, pageData)).then((page) => {
         navigationService.create({
             sessionTemp: data.data.sessionTemp,
             pages: page,
+            project: project._id,
             user
-        }, (err, navigation) => {
-            console.log(err);
-            console.log(navigation);
-        });
+        }, (err, navigation) => {});
     });
 }
 
@@ -64,19 +71,19 @@ function mergePageInfo(data) {
 }
 
 
-function updatePage(page, data) {
+function updatePage(navigation, data) {
     const pageData = mergePageInfo(data);
 
     new Promise(createPage.bind(this, pageData)).then((newPage) => {
-        page.pages.push(newPage);
-        page.save(() => {});
+        navigation.pages.push(newPage);
+        navigation.save(() => {});
     });
-
-
 }
+
 module.exports = {
     getNavigation,
     createNavigation,
     createPage,
-    updatePage
+    updatePage,
+    getNavigationByProject
 };

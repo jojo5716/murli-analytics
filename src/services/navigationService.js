@@ -30,8 +30,19 @@ function getBySession(sessionTemp, callback) {
     });
 }
 
+function getByProject(project, callback) {
+    navigationSchema.findOne({ project: project._id }, (err, page) => {
+        if (err) {
+            callback({ error: err }, null);
+        } else {
+            callback(null, page);
+        }
+    });
+}
+
 module.exports = {
     create,
     getAll,
-    getBySession
+    getBySession,
+    getByProject
 };
