@@ -7,17 +7,16 @@ module.exports = function(app) {
         res.send('Hello World')
     );
 
-    app.get('/users', userController.getAll);
-    app.get('/users/date/createAt/:dateFrom/:dateTo', userController.getByCreate);
-
-    app.get('/projects', projectController.getProjects);
     app.post('/project', projectController.createProject);
-
-    app.get('/pages', pageController.getAll);
-    app.get('/pages/createAt/:dateFrom/:dateTo/:project', pageController.getByCreate);
-
-
     app.post('/actions', pageController.saveAction);
     app.post('/track', pageController.trackPage);
+
+    // API Rest
+    app.get('/api/v1/users', userController.getAll);
+    app.get('/api/v1/users/date/createAt/:dateFrom/:dateTo', userController.getByCreate);
+
+    app.get('/api/v1/projects', projectController.getProjects);
+    app.get('/api/v1/pages', pageController.getAll);
+    app.get('/api/v1/pages/createAt/:dateFrom/:dateTo/:project', pageController.getByCreate);
 
 };
