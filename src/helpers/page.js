@@ -10,9 +10,9 @@ function getNavigation(sessionTemp, resolve, reject) {
     });
 }
 
-function getNavigationByProject(project, resolve, reject) {
+function getNavigationByProject(project, sessionTemp, resolve, reject) {
 
-    navigationService.getByProject(project, (err, page) => {
+    navigationService.getByProject(project, sessionTemp, (err, page) => {
         if (err) reject(err);
 
         resolve(page);
