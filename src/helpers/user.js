@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const userService = require('../services/userService');
 
 function mergeUserInfo(userInfo) {
@@ -10,16 +11,44 @@ function mergeUserInfo(userInfo) {
     return info;
 }
 
-function updateUserInfo(user, bookingInfo) {
-    const booking = {};
+function getCodeFromBookin(bookingInfo) {
+    let bookingCode = null;
 
-    if (bookingInfo.length > 0) {
-        for (const key in bookingInfo) {
-            const bookingData = bookingInfo[key];
-            booking[bookingData.key] = bookingData.value;
+    _.forEach(bookingInfo, (booking) => {
+       if (booking.key === 'bookingCode') {
+           bookingCode = booking.value;
+       }
+    });
+
+    return bookingCode;
+}
+
+function isBookingExist(bookings, bookingCode) {
+    let bookingExist = false;
+
+    _.forEach(bookings, (booking, index) => {
+        if (booking.bookingCode === bookingCode) {
+            bookingExist = true;
         }
-        user.bookings.push(booking);
-        user.save(() => {});
+    });
+
+    return bookingExist;
+}
+function updateUserInfo(user, bookingInfo) {
+    let booking = {};
+    const bookingCode = getCodeFromBookin(bookingInfo);
+    const bookingExist = isBookingExist(user.bookings, bookingCode);
+
+    if (!bookingExist) {
+        if (bookingInfo.length > 0) {
+            for (const key in bookingInfo) {
+                const bookingData = bookingInfo[key];
+                booking[bookingData.key] = bookingData.value;
+            }
+
+            user.bookings.push(booking);
+            user.save(() => {});
+        }
     }
 }
 
