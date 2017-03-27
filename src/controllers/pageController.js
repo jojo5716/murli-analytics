@@ -25,7 +25,7 @@ function pageController() {
             // Getting or create user
             const userPromise = new Promise(getUserOrCreate.bind(this, data)).then(user => {
                 // Getting page
-                const navigationPromise = new Promise(getNavigationByProject.bind(this, project)).then(navigation => {
+                const navigationPromise = new Promise(getNavigationByProject.bind(this, project, data.data.sessionTemp)).then(navigation => {
                     if (!navigation) {
                         createNavigation(data, user, project);
                     } else {
