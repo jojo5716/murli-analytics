@@ -71,7 +71,17 @@ function pageController() {
 
         pageService.getByCreate(dateFrom, dateTo, project, (err, navigationPages) => {
             if (err) {
-                console.log(err);
+                res.send({ error: err });
+            } else {
+                res.json({ navigationPages });
+            }
+        });
+    };
+
+    this.getAllNavigations = (req, res) => {
+
+        pageService.getAllNavigations((err, navigationPages) => {
+            if (err) {
                 res.send({ error: err });
             } else {
                 res.json({ navigationPages });

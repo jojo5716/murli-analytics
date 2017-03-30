@@ -10,6 +10,7 @@ module.exports = (function projectSchema() {
                 uuid.v4()
         },
         name: { type: String, required: true },
+        analytics: { type: String, required: false },
         createAt: { type: Date, default: Date.now }
     };
 

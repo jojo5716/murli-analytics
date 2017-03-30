@@ -52,9 +52,23 @@ function getByCreate(dateFrom, dateTo, project, callback) {
         });
 }
 
+function getAllNavigations(callback) {
+    navigationSchema.find({})
+        .populate(['pages', 'user'])
+        .sort({ createAt: 1 })
+        .exec((err, navigationPages) => {
+            if (err) {
+                callback(err);
+            } else {
+                callback(null, navigationPages);
+            }
+        });
+}
+
 module.exports = {
     create,
     getAll,
     getByToken,
-    getByCreate
+    getByCreate,
+    getAllNavigations
 };
