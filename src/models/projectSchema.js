@@ -1,14 +1,7 @@
-const uuid = require('uuid');
-
 module.exports = (function projectSchema() {
     const mongoose = require('../database').mongoose;
 
     const projectModel = {
-        _id: {
-            type: String,
-            default: () =>
-                uuid.v4()
-        },
         name: { type: String, required: true },
         analytics: { type: String, required: false },
         createAt: { type: Date, default: Date.now }

@@ -38,10 +38,12 @@ function pageController() {
                     console.log(err);
                 });
             }).catch(err => {
-                console.log(`USER PROMISE ERROR: ${err}`);
+                console.log('USER PROMISE ERROR');
+                console.log(err);
             });
         }).catch(err => {
-            console.log(`PROJECT PROMISE ERROR: ${err}`);
+            console.log('PROJECT PROMISE ERROR');
+            console.log(err)
         });
     };
 
