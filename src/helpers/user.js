@@ -26,7 +26,7 @@ function getCodeFromBookin(bookingInfo) {
 function isBookingExist(bookings, bookingCode) {
     let bookingExist = false;
 
-    _.forEach(bookings, (booking, index) => {
+    _.forEach(bookings, (booking) => {
         if (booking.bookingCode === bookingCode) {
             bookingExist = true;
         }
@@ -34,33 +34,14 @@ function isBookingExist(bookings, bookingCode) {
 
     return bookingExist;
 }
-function updateUserInfo(user, bookingInfo) {
-    let booking = {};
-    const bookingCode = getCodeFromBookin(bookingInfo);
-    const bookingExist = isBookingExist(user.bookings, bookingCode);
-
-    if (!bookingExist) {
-        if (bookingInfo.length > 0) {
-            for (const key in bookingInfo) {
-                const bookingData = bookingInfo[key];
-                booking[bookingData.key] = bookingData.value;
-            }
-
-            user.bookings.push(booking);
-            user.save(() => {});
-        }
-    }
-}
 
 function getUserOrCreate(data, resolve, reject) {
     userService.getBySession(data.data.session, (err, user) => {
         if (err) reject(err);
 
         if (user) {
-            updateUserInfo(user, data.data.booking);
             resolve(user);
         } else {
-            updateUserInfo(user, data.data.booking);
             const userInfo = {
                 dataUser: data.data.enviroment[0],
                 session: data.data.session

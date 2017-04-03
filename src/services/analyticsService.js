@@ -14,7 +14,6 @@ function createReport(args, callback) {
 
 function getAll(callback) {
     analyticsSchema.find({})
-        .populate(['projects'])
         .exec((err, reports) => {
             if (err) {
                 callback(err);

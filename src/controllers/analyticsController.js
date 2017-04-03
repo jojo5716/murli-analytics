@@ -42,14 +42,7 @@ function analyticsController() {
                 if (project) {
                     let reportsProject = [];
                     analyticsService.getAll((err, reports) => {
-                        console.log(reports);
-                        console.log("---------");
-
-                        console.log(_)
-                        const projects = _.map(reports.projects, 'id');
-                        console.log(projects);
-
-                        res.json({ reportsProject });
+                        res.json({ reports });
                     });
                 }
             })

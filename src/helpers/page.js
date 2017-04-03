@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const navigationService = require('../services/navigationService');
 const pageService = require('../services/pageService');
 
@@ -70,12 +71,26 @@ function mergePageInfo(data) {
     return pageInfoCloned;
 }
 
+function formatBooking(booking) {
+    const bookingFormatted = {};
+    _.forEach(booking, (bookingAttr) => {
+       bookingFormatted[bookingAttr.key] = bookingAttr.value;
+    });
+
+    return bookingFormatted;
+}
 
 function updatePage(navigation, data) {
     const pageData = mergePageInfo(data);
 
+
     new Promise(createPage.bind(this, pageData)).then((newPage) => {
         navigation.pages.push(newPage);
+
+        if (data.data.booking.length > 0) {
+            const booking = formatBooking(data.data.booking);
+            navigation.bookings.push(booking);
+        }
         navigation.save(() => {});
     });
 }
