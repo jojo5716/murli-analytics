@@ -83,16 +83,31 @@ function formatBooking(booking) {
 function updatePage(navigation, data) {
     const pageData = mergePageInfo(data);
 
+    return new Promise(createPage.bind(this, pageData))
+        .then(insertPage)
+        .then(insertOrUpdateBooking)
+        .then(saveNavigation);
 
-    new Promise(createPage.bind(this, pageData)).then((newPage) => {
-        navigation.pages.push(newPage);
+    function insertPage(page) {
+        return navigation.pages.push(page);
+    }
 
+    function insertOrUpdateBooking() {
         if (data.data.booking.length > 0) {
             const booking = formatBooking(data.data.booking);
-            navigation.bookings.push(booking);
+            const index = navigation.bookings.findIndex(each => each.bookingCode === booking.bookingCode)
+            if (index !== -1) {
+                navigation.bookings[index] = booking;
+            } else {
+                navigation.bookings.push(booking);
+            }
         }
-        navigation.save(() => {});
-    });
+    }
+
+    function saveNavigation() {
+        navigation.save();
+    }
+
 }
 
 module.exports = {
