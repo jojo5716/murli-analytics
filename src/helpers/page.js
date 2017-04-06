@@ -76,8 +76,16 @@ function formatBooking(booking) {
     _.forEach(booking, (bookingAttr) => {
        bookingFormatted[bookingAttr.key] = bookingAttr.value;
     });
-
+    bookingFormatted.rooms = formatBookingRooms(bookingFormatted);
     return bookingFormatted;
+}
+
+function formatBookingRooms(booking) {
+    if (typeof booking.rooms === 'string') {
+        // this is the case when rooms data comes as an encoded JSON
+        return JSON.parse(booking.rooms.replace(/&quot;/g,'"'));
+    }
+    return booking.rooms;
 }
 
 function updatePage(navigation, data) {
@@ -93,8 +101,11 @@ function updatePage(navigation, data) {
     }
 
     function insertOrUpdateBooking() {
-        if (data.data.booking.length > 0) {
-            const booking = formatBooking(data.data.booking);
+        if (data.data.booking.length === 0) {
+            return;
+        }
+        const booking = formatBooking(data.data.booking);
+        if (bookingIsNotABonoVisit(booking)) {
             const index = navigation.bookings.findIndex(each => each.bookingCode === booking.bookingCode)
             if (index !== -1) {
                 navigation.bookings[index] = booking;
@@ -102,6 +113,13 @@ function updatePage(navigation, data) {
                 navigation.bookings.push(booking);
             }
         }
+    }
+
+    function bookingIsNotABonoVisit(booking) {
+        // Because booking data is set everytime the bono is visited,
+        // we only want to count it as a booking
+        // when it has the rooms or packs information
+        return !!(booking.rooms || booking.packs);
     }
 
     function saveNavigation() {
