@@ -1,5 +1,7 @@
 const navigationSchema = require('../models/navigationSchema');
 
+const PAGE_SIZE = 100;
+
 function create(args, callback) {
     navigationSchema.create(args, (err, page) => {
         if (err) {
@@ -10,14 +12,25 @@ function create(args, callback) {
     });
 }
 
-function getAll(callback) {
-    navigationSchema.find({}, (err, pages) => {
-        if (err) {
-            callback({ error: err }, null);
-        } else {
-            callback(null, pages);
-        }
-    });
+/**
+ * Get all navigations (paginated)
+ *
+ * @param {any} page The page to retrieve
+ * @param {any} callback
+ */
+function getAll(page, callback) {
+    navigationSchema
+        .find()
+        .populate(['pages', 'user'])
+        .skip(PAGE_SIZE * (page-1))
+        .limit(PAGE_SIZE)
+        .exec((err, pages) => {
+            if (err) {
+                callback({ error: err }, null);
+            } else {
+                callback(null, pages);
+            }
+        });
 }
 
 /**
@@ -30,20 +43,22 @@ function getAll(callback) {
  * @param {any} callback
  */
 function getAllByCreationDate(dateFrom, dateTo, project, page=1, callback) {
-    const pageSize = 100;
     const query = {
         createAt: {
             $gte: dateFrom,
             $lte: dateTo
         }
     }
+
     if (project) {
         query.project = project;
     }
-    navigationSchema.find(query)
+
+    navigationSchema
+        .find(query)
         .populate(['pages', 'user'])
-        .skip(pageSize * (page-1))
-        .limit(pageSize)
+        .skip(PAGE_SIZE * (page-1))
+        .limit(PAGE_SIZE)
         .sort({ createAt: 1 })
         .exec((err, navigationPages) => {
             if (err) {

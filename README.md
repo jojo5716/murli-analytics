@@ -11,6 +11,12 @@ npm start
 
 # Usage
 
+To access navigation data, use:
+
+```
+http://localhost:8000/api/v1/navigations?page=1
+```
+
 You can filter navigations by a date range
 
 ```

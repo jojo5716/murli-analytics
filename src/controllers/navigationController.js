@@ -10,12 +10,26 @@ const { getUserOrCreate } = require('../helpers/user');
 module.exports = {
 
     /**
+     * Gets all navigations (paginated)
+     */
+    getAll: (req, res) => {
+        const page = req.params.page || 1;
+        navigationService.getAll(page, (err, navigationPages) => {
+            if (err) {
+                res.send({ error: err });
+            } else {
+                res.json({ navigationPages });
+            }
+        });
+    },
+
+    /**
      * Get all navigations created between
      * two dates
      */
     getAllByCreationDate: (req, res) => {
         const project = req.params.project;
-        const page = req.params.page;
+        const page = req.params.page || 1;
         let dateFrom = req.params.dateFrom;
         let dateTo = req.params.dateTo;
 

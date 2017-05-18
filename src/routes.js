@@ -22,6 +22,7 @@ module.exports = (app) => {
     app.get('/api/v1/pages', pageController.getAll);
     app.get('/api/v1/pages/createAt/:dateFrom/:dateTo', pageController.getAllByCreationDate);
 
+    app.get('/api/v1/navigations', navigationController.getAll);
     app.get('/api/v1/navigations/createAt/:dateFrom/:dateTo', navigationController.getAllByCreationDate);
     app.get('/api/v1/navigations/createAt/:dateFrom/:dateTo/:project', navigationController.getAllByCreationDate);
 
