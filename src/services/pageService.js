@@ -32,43 +32,22 @@ function getByToken(pageToken, callback) {
     });
 }
 
-function getAllByCreationDate(dateFrom, dateTo, project, callback) {
-    navigationSchema.find(
-        {
-            project,
-            createAt: {
-                $gte: dateFrom,
-                $lte: dateTo
-            }
-        })
-        .populate(['pages', 'user'])
-        .sort({ createAt: 1 })
-        .exec((err, navigationPages) => {
-            if (err) {
-                callback({ error: err });
-            } else {
-                callback(null, navigationPages);
-            }
-        });
+function getAllByCreationDate(dateFrom, dateTo, callback) {
+    pageSchema.find({ createAt: { $gte: dateFrom, $lte: dateTo } }, (err, page) => {
+        if (err) {
+            callback({ error: err });
+        } else {
+            callback(null, page);
+        }
+    });
 }
 
-function getAllNavigations(callback) {
-    navigationSchema.find({})
-        .populate(['pages', 'user'])
-        .sort({ createAt: 1 })
-        .exec((err, navigationPages) => {
-            if (err) {
-                callback(err);
-            } else {
-                callback(null, navigationPages);
-            }
-        });
-}
+
+
 
 module.exports = {
     create,
     getAll,
     getByToken,
-    getAllByCreationDate,
-    getAllNavigations
+    getAllByCreationDate
 };

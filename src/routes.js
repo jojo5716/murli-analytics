@@ -1,6 +1,7 @@
 const userController = require('./controllers/userController');
 const projectController = require('./controllers/projectController');
 const pageController = require('./controllers/pageController');
+const navigationController = require('./controllers/navigationController');
 const analyticsController = require('./controllers/analyticsController');
 
 module.exports = (app) => {
@@ -17,9 +18,12 @@ module.exports = (app) => {
     app.get('/api/v1/users/date/createAt/:dateFrom/:dateTo', userController.getAllByCreationDate);
 
     app.get('/api/v1/projects', projectController.getProjects);
+
     app.get('/api/v1/pages', pageController.getAll);
-    app.get('/api/v1/navigations', pageController.getAllNavigations);
-    app.get('/api/v1/pages/createAt/:dateFrom/:dateTo/:project', pageController.getAllByCreationDate);
+    app.get('/api/v1/pages/createAt/:dateFrom/:dateTo', pageController.getAllByCreationDate);
+
+    app.get('/api/v1/navigations/createAt/:dateFrom/:dateTo', navigationController.getAllByCreationDate);
+    app.get('/api/v1/navigations/createAt/:dateFrom/:dateTo/:project', navigationController.getAllByCreationDate);
 
     // Analytics
     app.post('/api/v1/analytics/new/report/:project', analyticsController.createReport);
