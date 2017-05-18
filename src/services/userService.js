@@ -30,7 +30,7 @@ function getBySession(session, callback) {
     });
 }
 
-function getByCreate(dateFrom, dateTo, callback) {
+function getAllByCreationDate(dateFrom, dateTo, callback) {
     userSchema.find({ createAt: { $gte: dateFrom, $lte: dateTo } }, (err, user) => {
         if (err) {
             callback({ error: err });
@@ -45,5 +45,5 @@ module.exports = {
     create,
     getAll,
     getBySession,
-    getByCreate
+    getAllByCreationDate
 };

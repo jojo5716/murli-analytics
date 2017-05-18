@@ -63,26 +63,14 @@ function pageController() {
         });
     };
 
-    this.getByCreate = (req, res) => {
+    this.getAllByCreationDate = (req, res) => {
         let dateFrom = req.params.dateFrom;
         let dateTo = req.params.dateTo;
-        let project = req.params.project;
 
         dateFrom = new Date(`${dateFrom}T00:00:00.000Z`);
         dateTo = new Date(`${dateTo}T23:59:59.599Z`);
 
-        pageService.getByCreate(dateFrom, dateTo, project, (err, navigationPages) => {
-            if (err) {
-                res.send({ error: err });
-            } else {
-                res.json({ navigationPages });
-            }
-        });
-    };
-
-    this.getAllNavigations = (req, res) => {
-
-        pageService.getAllNavigations((err, navigationPages) => {
+        pageService.getAllByCreationDate(dateFrom, dateTo, (err, navigationPages) => {
             if (err) {
                 res.send({ error: err });
             } else {
