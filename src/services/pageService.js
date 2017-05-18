@@ -32,7 +32,7 @@ function getByToken(pageToken, callback) {
     });
 }
 
-function getByCreate(dateFrom, dateTo, project, callback) {
+function getAllByCreationDate(dateFrom, dateTo, project, callback) {
     navigationSchema.find(
         {
             project,
@@ -69,6 +69,6 @@ module.exports = {
     create,
     getAll,
     getByToken,
-    getByCreate,
+    getAllByCreationDate,
     getAllNavigations
 };

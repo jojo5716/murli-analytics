@@ -14,11 +14,11 @@ function userController() {
         });
     };
 
-    this.getByCreate = (req, res) => {
+    this.getAllByCreationDate = (req, res) => {
         const dateFrom = new Date(req.params.dateFrom);
         const dateTo = new Date(req.params.dateTo);
 
-        userService.getByCreate(dateFrom, dateTo, (err, users) => {
+        userService.getAllByCreationDate(dateFrom, dateTo, (err, users) => {
             if (err) {
                 console.log(err);
                 res.send({ error: err });
