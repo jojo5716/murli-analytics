@@ -5,10 +5,6 @@ const navigationController = require('./controllers/navigationController');
 const analyticsController = require('./controllers/analyticsController');
 
 module.exports = (app) => {
-    app.get('/', (req, res) =>
-        res.send('Hello World')
-    );
-
     app.post('/project', projectController.createProject);
     app.post('/actions', pageController.saveAction);
     app.post('/track', pageController.trackPage);

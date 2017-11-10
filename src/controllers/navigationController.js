@@ -36,13 +36,9 @@ module.exports = {
         dateFrom = new Date(`${dateFrom}T00:00:00.000Z`);
         dateTo = new Date(`${dateTo}T23:59:59.599Z`);
 
-        navigationService.getAllByCreationDate(dateFrom, dateTo, project, page, (err, navigationPages) => {
-            if (err) {
-                res.send({ error: err });
-            } else {
-                res.json({ navigationPages });
-            }
-        });
+        const navigationPages = navigationService.getAllByCreationDate(dateFrom, dateTo, project, page);
+
+        res.json({ navigationPages });
     }
 
 }

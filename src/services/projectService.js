@@ -1,25 +1,23 @@
 const projectSchema = require('../models/projectSchema');
 
-function getAll(callback) {
-    projectSchema.find({}, (err, projects) => {
-        if (err) {
-            callback({ error: err }, null);
-        } else {
-            callback(null, projects);
-        }
-    });
-}
-
-function getById(id, callback) {
-    projectSchema.findOne({_id: id }, (err, project) => {
-        if (err) {
-            callback({ error: err });
-        } else {
-            callback(null, project);
-        }
-    });
-}
 module.exports = {
     getAll,
     getById
 };
+
+/**
+ * Get all project
+ *
+ */
+async function getAll() {
+    return await projectSchema.find({});
+}
+
+/**
+ * Get project by ID
+ *
+ * @param {string} id
+ */
+async function getById(id) {
+    return await projectSchema.findOne({_id: id });
+}

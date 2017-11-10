@@ -1,82 +1,92 @@
-const Promise = require('promise');
-
 const pageService = require('../services/pageService');
-const { getProject } = require('../helpers/project');
+const projectService = require('../services/projectService');
+const userService = require('../services/userService');
+const navigationService = require('../services/navigationService');
+
 const { getUserOrCreate } = require('../helpers/user');
-const { getNavigationByProject, createNavigation, updatePage } = require('../helpers/page');
+
+
 
 function pageController() {
+    /**
+     * Get all pages visited
+     *
+     * @param {any} req
+     * @param {any} res
+     */
+    this.getAll = async (req, res) => {
+        const pages = await pageService.getAll();
 
-    this.getAll = (req, res) => {
-        pageService.getAll((err, pages) => {
-            if (err) {
-                console.log(err);
-                res.json({ error: err });
-            } else {
-                res.json({ pages });
-            }
-        });
+        res.json({ pages });
     };
 
-    this.trackPage = (req, res) => {
+    /**
+    * When user visit a page we register all data about, user, metrics, etc..
+    * into a page a navigation page models.
+    *
+    */
+    this.trackPage = async (req, res) => {
         const data = JSON.parse(req.body || null);
-        // Getting project
-        const projectPromise = new Promise(getProject.bind(this, data.project)).then(project => {
-            // Getting or create user
-            const userPromise = new Promise(getUserOrCreate.bind(this, data)).then(user => {
-                // Getting page
-                const navigationPromise = new Promise(getNavigationByProject.bind(this, project, data.data.sessionTemp)).then(navigation => {
-                    if (!navigation) {
-                        createNavigation(data, user, project);
-                    } else {
-                        // If we can a page we update with the new page info.
-                        updatePage(navigation, data);
-                    }
-                    return res.send({ success: true });
-                }).catch(err => {
-                    console.log(`NAVIGATION PROMISE ERROR`);
-                    console.log(err);
-                });
-            }).catch(err => {
-                console.log('USER PROMISE ERROR');
-                console.log(err);
-            });
-        }).catch(err => {
-            console.log('PROJECT PROMISE ERROR');
-            console.log(err)
-        });
+        const project = await projectService.getById(data.project);
+
+        if (project && data) {
+            const sessionTemp = data.data.sessionTemp;
+            const user = await userService.getUserOrCreate(data);
+            const navigation = await navigationService.getByProject(project._id, sessionTemp);
+
+            if (navigation) {
+                // Then is not the first time thant user visit a page
+                // and we need to update the pages model.
+                pageService.updatePage(navigation, data);
+            } else {
+                navigationService.createNavigation(data, user, project._id);
+            }
+        }
     };
 
-    this.saveAction = (req, res) => {
+    /**
+     * To register a new user action
+     *
+     */
+    this.saveAction = async (req, res) => {
         const data = JSON.parse(req.body);
 
-        pageService.getByToken(data.data.pageToken, (error, page) => {
-            if (error || !page) {
-                res.json({ error });
-            } else {
-                for (let i = 0; i < data.data.actions.length; i += 1) {
-                    page.actions.push(data.data.actions[i]);
-                }
-                page.save(() => {});
-                res.json({ success: true });
-            }
-        });
+        const page = await pageService.getByToken(data.data.pageToken);
+
+        for (let i = 0; i < data.data.actions.length; i += 1) {
+            page.actions.push(data.data.actions[i]);
+        }
+
+        page.save();
+
+        res.json({ success: true });
     };
 
-    this.getAllByCreationDate = (req, res) => {
+    /**
+     * Get navigation and pages by a date
+     *
+     */
+    this.getAllByCreationDate = async (req, res) => {
         let dateFrom = req.params.dateFrom;
         let dateTo = req.params.dateTo;
 
         dateFrom = new Date(`${dateFrom}T00:00:00.000Z`);
         dateTo = new Date(`${dateTo}T23:59:59.599Z`);
 
-        pageService.getAllByCreationDate(dateFrom, dateTo, (err, navigationPages) => {
-            if (err) {
-                res.send({ error: err });
-            } else {
-                res.json({ navigationPages });
-            }
-        });
+        const navigationPages = await navigationService.getAllByCreationDate(dateFrom, dateTo, project);
+
+        res.json({ navigationPages });
+    };
+
+    /**
+     * Get all navigation pages
+     *
+     * @returns {array} Navigation pages
+     */
+    this.getAllNavigations = async (req, res) => {
+        const navigations = await navigationService.getAll();
+
+        res.json({ navigations });
     };
 
     return this;
