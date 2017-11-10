@@ -1,28 +1,56 @@
 const _ = require('lodash');
-const userService = require('../services/userService');
 
-function mergeUserInfo(userInfo) {
+
+module.exports = {
+    parseUserInfo,
+    getCodeFromBookin,
+    isBookingExist
+};
+
+
+/**
+ * Get an object with all user info data
+ *
+ * @param {array} userInfo Array where each item has a key and value property
+ * @returns {object} user info parsed
+ */
+function parseUserInfo(userInfo) {
     const info = {};
 
     for (const key in userInfo) {
         const userData = userInfo[key];
+
         info[userData.key] = userData.value;
     }
+
     return info;
 }
 
+/**
+ * Get code from booking object
+ *
+ * @param {object} bookingInfo
+ * @returns {string} Booking code
+ */
 function getCodeFromBookin(bookingInfo) {
     let bookingCode = null;
 
     _.forEach(bookingInfo, (booking) => {
-       if (booking.key === 'bookingCode') {
-           bookingCode = booking.value;
-       }
+        if (booking.key === 'bookingCode') {
+            bookingCode = booking.value;
+        }
     });
 
     return bookingCode;
 }
 
+/**
+ * Return a boolean if the booking exist
+ *
+ * @param {array} bookings
+ * @param {string} bookingCode
+ * @returns {boolean} Booking exist
+ */
 function isBookingExist(bookings, bookingCode) {
     let bookingExist = false;
 
@@ -34,32 +62,3 @@ function isBookingExist(bookings, bookingCode) {
 
     return bookingExist;
 }
-
-function getUserOrCreate(data, resolve, reject) {
-    userService.getBySession(data.data.session, (err, user) => {
-        if (err) reject(err);
-
-        if (user) {
-            resolve(user);
-        } else {
-            const userInfo = {
-                dataUser: data.data.enviroment[0],
-                session: data.data.session
-            };
-            const extraData = mergeUserInfo(data.data.userInfo);
-            const mergedInfo = Object.assign(userInfo, extraData);
-
-            userService.create(mergedInfo, (error, user) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(user);
-                }
-            });
-        }
-    });
-}
-
-module.exports = {
-    getUserOrCreate
-};

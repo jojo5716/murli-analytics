@@ -3,29 +3,19 @@ const userService = require('../services/userService');
 
 function userController() {
 
-    this.getAll = (req, res) => {
-        userService.getAll((err, users) => {
-            if (err) {
-                console.log(err);
-                res.send({ error: err });
-            } else {
-                res.json({ users });
-            }
-        });
+    this.getAll = async(req, res) => {
+        const users = await userService.getAll();
+
+        res.json({ users });
     };
 
-    this.getByCreate = (req, res) => {
+    this.getByCreate = async(req, res) => {
         const dateFrom = new Date(req.params.dateFrom);
         const dateTo = new Date(req.params.dateTo);
 
-        userService.getByCreate(dateFrom, dateTo, (err, users) => {
-            if (err) {
-                console.log(err);
-                res.send({ error: err });
-            } else {
-                res.json({ users });
-            }
-        });
+        const users = await userService.getByCreate(dateFrom, dateTo);
+
+        res.json({ users });
     };
 
     return this;

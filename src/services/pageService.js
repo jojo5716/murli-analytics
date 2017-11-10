@@ -1,17 +1,31 @@
 const pageSchema = require('../models/pageSchema');
 const navigationSchema = require('../models/navigationSchema');
+const { mergePageInfo, formatBooking } = require('../helpers/page');
 
 
-function create(args, callback) {
-    pageSchema.create(args, (err, page) => {
-        if (err) {
-            callback(err, null);
-        } else {
-            callback(null, page);
-        }
-    });
+module.exports = {
+    create,
+    getAll,
+    getByToken,
+    updatePage
+};
+
+/**
+ * Create a new page
+ *
+ * @param {any} args
+ * @returns {object} Page
+ */
+async function create(args) {
+    return await pageSchema.create(args);
 }
 
+/**
+ * Getting all pages from db
+ *
+ * @param {any} callback
+ * @return {array} Pages
+ */
 function getAll(callback) {
     pageSchema.find({}, (err, pages) => {
         if (err) {
@@ -21,54 +35,62 @@ function getAll(callback) {
         }
     });
 }
+/**
+ * Get page by token
+ *
+ * @param {any} pageToken
+ * @param {any} callback
+ */
+async function getByToken(pageToken, callback) {
+    return await pageSchema.findOne({ pageToken });
+}
 
-function getByToken(pageToken, callback) {
-    pageSchema.findOne({ pageToken }, (err, page) => {
-        if (err) {
-            callback({ error: err }, null);
-        } else {
-            callback(null, page);
+/**
+ * Update page model to add a new visit page into a Navigation model.
+ *  When a user visit a page, that is saved into a navigation model.
+ * @param {object} navigation Navigation object
+ * @param {any} data
+ * @returns
+ */
+async function updatePage(navigation, data) {
+    const pageData = mergePageInfo(data);
+    const newPage = await create(pageData);
+
+    // Pushing the new page into navigation
+    navigation.pages.push(newPage);
+
+    insertOrUpdateBooking(navigation, data.data.booking);
+
+    navigation.save();
+
+}
+
+/**
+ * If the new page visited has a new booking we need to add it
+ * into a navigation object
+ *
+ * @param {object} navigation
+ * @param {any} booking
+ */
+function insertOrUpdateBooking(navigation, booking) {
+    if (booking.length !== 0) {
+        const booking = formatBooking(booking);
+
+        if (bookingIsNotABonoVisit(booking)) {
+            const index = navigation.bookings.findIndex(each => each.bookingCode === booking.bookingCode);
+
+            if (index !== -1) {
+                navigation.bookings[index] = booking;
+            } else {
+                navigation.bookings.push(booking);
+            }
         }
-    });
+    }
 }
 
-function getByCreate(dateFrom, dateTo, project, callback) {
-    navigationSchema.find(
-        {
-            project,
-            createAt: {
-                $gte: dateFrom,
-                $lte: dateTo
-            }
-        })
-        .populate(['pages', 'user'])
-        .sort({ createAt: 1 })
-        .exec((err, navigationPages) => {
-            if (err) {
-                callback({ error: err });
-            } else {
-                callback(null, navigationPages);
-            }
-        });
+function bookingIsNotABonoVisit(booking) {
+    // Because booking data is set everytime the bono is visited,
+    // we only want to count it as a booking
+    // when it has the rooms or packs information
+    return !!(booking.rooms || booking.packs);
 }
-
-function getAllNavigations(callback) {
-    navigationSchema.find({})
-        .populate(['pages', 'user'])
-        .sort({ createAt: 1 })
-        .exec((err, navigationPages) => {
-            if (err) {
-                callback(err);
-            } else {
-                callback(null, navigationPages);
-            }
-        });
-}
-
-module.exports = {
-    create,
-    getAll,
-    getByToken,
-    getByCreate,
-    getAllNavigations
-};

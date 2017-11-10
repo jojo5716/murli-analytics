@@ -4,10 +4,6 @@ module.exports = function(app) {
     const pageController = require('./controllers/pageController');
     const analyticsController = require('./controllers/analyticsController');
 
-    app.get('/', (req, res) =>
-        res.send('Hello World')
-    );
-
     app.post('/project', projectController.createProject);
     app.post('/actions', pageController.saveAction);
     app.post('/track', pageController.trackPage);
