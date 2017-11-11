@@ -5,7 +5,12 @@ module.exports = {
     formatBooking
 };
 
-
+/**
+ * Create a copy of data object and parse it to get a simple object
+ *
+ * @param {object} data
+ * @returns {object} Data copy parse
+ */
 function mergePageInfo(data) {
     // Getting url and previous url for the page visited
     const pageInfo = data.data.page[0];

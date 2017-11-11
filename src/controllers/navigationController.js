@@ -12,22 +12,18 @@ module.exports = {
     /**
      * Gets all navigations (paginated)
      */
-    getAll: (req, res) => {
+    getAll: async (req, res) => {
         const page = req.params.page || 1;
-        navigationService.getAll(page, (err, navigationPages) => {
-            if (err) {
-                res.send({ error: err });
-            } else {
-                res.json({ navigationPages });
-            }
-        });
+        const navigationPages = await navigationService.getAll(page);
+
+        res.json({ navigationPages });
     },
 
     /**
      * Get all navigations created between
      * two dates
      */
-    getAllByCreationDate: (req, res) => {
+    getAllByCreationDate: async (req, res) => {
         const project = req.params.project;
         const page = req.params.page || 1;
         let dateFrom = req.params.dateFrom;
@@ -36,7 +32,7 @@ module.exports = {
         dateFrom = new Date(`${dateFrom}T00:00:00.000Z`);
         dateTo = new Date(`${dateTo}T23:59:59.599Z`);
 
-        const navigationPages = navigationService.getAllByCreationDate(dateFrom, dateTo, project, page);
+        const navigationPages = await navigationService.getAllByCreationDate(dateFrom, dateTo, project, page);
 
         res.json({ navigationPages });
     }

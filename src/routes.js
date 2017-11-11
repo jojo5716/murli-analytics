@@ -10,19 +10,24 @@ module.exports = (app) => {
     app.post('/track', pageController.trackPage);
 
     // API Rest
+
+    // User views
     app.get('/api/v1/users', userController.getAll);
     app.get('/api/v1/users/date/createAt/:dateFrom/:dateTo', userController.getAllByCreationDate);
 
+    // Project views
     app.get('/api/v1/projects', projectController.getProjects);
 
+    // Pages views
     app.get('/api/v1/pages', pageController.getAll);
-    app.get('/api/v1/pages/createAt/:dateFrom/:dateTo', pageController.getAllByCreationDate);
 
+    // Navigation views
     app.get('/api/v1/navigations', navigationController.getAll);
     app.get('/api/v1/navigations/createAt/:dateFrom/:dateTo', navigationController.getAllByCreationDate);
     app.get('/api/v1/navigations/createAt/:dateFrom/:dateTo/:project', navigationController.getAllByCreationDate);
+    app.get('/api/v1/navigations/createAt/:dateFrom/:dateTo/:project/:page', navigationController.getAllByCreationDate);
 
-    // Analytics
+    // Analytics views
     app.post('/api/v1/analytics/new/report/:project', analyticsController.createReport);
     app.get('/api/v1/analytics/reports/:project', analyticsController.getReports);
     app.get('/api/v1/analytics/all/reports/', analyticsController.getAllReports);

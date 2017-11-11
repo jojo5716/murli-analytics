@@ -2,6 +2,19 @@ const navigationSchema = require('../models/navigationSchema');
 const { mergePageInfo } = require('../helpers/page');
 const pageService = require('../services/pageService');
 
+const PAGE_SIZE = 100;
+
+
+module.exports = {
+    create,
+    getAll,
+    getAllByCreationDate,
+    getBySession,
+    getByProject,
+    createNavigation
+};
+
+
 /**
  * Create new navigation
  *
@@ -28,7 +41,7 @@ async function getAll(page) {
  *
  * @param {string} sessionTemp
  */
-async function getBySession(sessionTemp, callback) {
+async function getBySession(sessionTemp) {
     return await navigationSchema.findOne({ sessionTemp });
 }
 
@@ -71,7 +84,7 @@ async function createNavigation(data, user, projectID) {
  * @param {object} dateTo
  * @param {object} project
  */
-async function getAllByCreationDate(dateFrom, dateTo, project) {
+async function getAllByCreationDate(dateFrom, dateTo, project, page = 1) {
     const query = {
         createAt: {
             $gte: dateFrom,
@@ -90,15 +103,6 @@ async function getAllByCreationDate(dateFrom, dateTo, project) {
         .limit(PAGE_SIZE)
         .sort({ createAt: 1 });
 
+    console.log(navigations)
     return navigations;
 }
-
-module.exports = {
-    create,
-    getAll,
-    getAllByCreationDate,
-    getBySession,
-    getByProject,
-    createNavigation,
-    getAllByCreationDate
-};
