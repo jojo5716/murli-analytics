@@ -1,12 +1,8 @@
-const Promise = require('promise');
-
 const navigationService = require('../services/navigationService');
 const { getProject } = require('../helpers/project');
 const { getUserOrCreate } = require('../helpers/user');
 
-/**
- * Navigation Controller
- */
+
 module.exports = {
 
     /**
@@ -36,5 +32,4 @@ module.exports = {
 
         res.json({ navigationPages });
     }
-
 }

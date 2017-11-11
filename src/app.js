@@ -1,5 +1,12 @@
 const restify = require('restify');
+const kue = require('kue');
+
+require('./workers/listeners');
+
 const config = require('../config');
+
+// Kue dashboard to view all job list
+kue.app.listen(3000);
 
 const app = restify.createServer({ name: 'murli-api' });
 
