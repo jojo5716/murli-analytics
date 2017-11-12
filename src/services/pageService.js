@@ -2,7 +2,6 @@ const pageSchema = require('../models/pageSchema');
 const navigationSchema = require('../models/navigationSchema');
 const { mergePageInfo, formatBooking } = require('../helpers/page');
 
-
 module.exports = {
     create,
     getAll,

@@ -1,10 +1,15 @@
+const kue = require('kue');
+
 const pageService = require('../services/pageService');
 const projectService = require('../services/projectService');
 const userService = require('../services/userService');
 const navigationService = require('../services/navigationService');
 
 const { getUserOrCreate } = require('../helpers/user');
+const navigationWorkerService = require('../services/workers/navigationWorkerService');
 
+
+const queue = kue.createQueue();
 
 module.exports = {
     /**
@@ -40,6 +45,8 @@ module.exports = {
             } else {
                 navigationService.createNavigation(data, user, project._id);
             }
+
+            navigationWorkerService.accumulateMetricsPageVisit(data);
         }
     },
 

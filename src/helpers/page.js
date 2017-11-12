@@ -2,7 +2,8 @@ const _ = require('lodash');
 
 module.exports = {
     mergePageInfo,
-    formatBooking
+    formatBooking,
+    getTypeSeccionPage
 };
 
 /**
@@ -59,7 +60,7 @@ function formatBooking(booking) {
     const bookingFormatted = {};
 
     _.forEach(booking, (bookingAttr) => {
-       bookingFormatted[bookingAttr.key] = bookingAttr.value;
+        bookingFormatted[bookingAttr.key] = bookingAttr.value;
     });
 
     bookingFormatted.rooms = formatBookingRooms(bookingFormatted);
@@ -76,8 +77,27 @@ function formatBooking(booking) {
 function formatBookingRooms(booking) {
     if (typeof booking.rooms === 'string') {
         // this is the case when rooms data comes as an encoded JSON
-        return JSON.parse(booking.rooms.replace(/&quot;/g,'"'));
+        return JSON.parse(booking.rooms.replace(/&quot;/g, '"'));
     }
 
     return booking.rooms;
+}
+
+/**
+ * Return the type of page that user is visiting
+ * Types can be: content, availability, no-availability
+ * @param {string} url
+ */
+function getTypeSeccionPage(url) {
+    let typeName = 'content';
+
+    if (url.indexOf('availability/rooms') != -1) {
+        typeName = 'availability';
+    } else if (url.indexOf('availability/hotels') != -1) {
+        typeName = 'availability-hotels';
+    } else if (url.indexOf('bookcore/no-availability') != -1) {
+        typeName = 'no-availability';
+    }
+
+    return typeName;
 }
