@@ -1,9 +1,17 @@
-const { getTypeSeccionPage } = require('../helpers/page');
-
+const pageMetricSchema = require('../models/metrics/pageMetricSchema');
+const navigationWorkerService = require('../services/workers/navigationWorkerService');
+const projectService = require('../services/projectService');
+const { getTypeSeccionPage, getUrlFromPageData } = require('../helpers/page');
+const {
+    getAtHourVisit,
+    generateBasicMetricPageSchema,
+    updateMetricPageContent
+ } = require('../helpers/workers/page');
 
 module.exports = {
     accumulateMetricsPageVisit
 }
+
 
 /**
  * When a user visit a page, we need to accumulate all data about
@@ -11,12 +19,39 @@ module.exports = {
  * @param {object} pageData
  * @param {callback} done
  */
-function accumulateMetricsPageVisit(pageData, done) {
-    const pageInfo = pageData.data.page[0];
-    const url = pageInfo.url;
+async function accumulateMetricsPageVisit(pageData, done) {
+    console.log(pageData);
+
+    const url = getUrlFromPageData(pageData);
+    const project = pageData.project;
+
+    // Get page type (content, availability, no-availability...)
     const pageType = getTypeSeccionPage(url);
 
+    const metric = await navigationWorkerService.findMetricRowByType(project, pageType);
 
+    if (!metric) {
+        const metricPage = generateBasicMetricPageSchema(url);
+
+        const metricObj = {
+            project,
+            type: pageType,
+            pages: [updateMetricPageContent(metricPage, pageData)]
+        };
+
+        console.log(metricObj);
+
+        navigationWorkerService.create(metricObj);
+    } else {
+        // TODO: Filtrar todas las paginas de la metrica para actualizar la pagina
+        // que estamos visitando.
+
+        /*  metric.pages.push(
+             updateMetricPageContent(metricPage, pageData)
+         );
+ 
+         metric.save(); */
+    }
 
     done();
 }

@@ -46,7 +46,7 @@ module.exports = {
                 navigationService.createNavigation(data, user, project._id);
             }
 
-            navigationWorkerService.accumulateMetricsPageVisit(data);
+            navigationWorkerService.accumulateMetricsPageVisit(user._id, data);
         }
     },
 

@@ -3,7 +3,10 @@ const _ = require('lodash');
 module.exports = {
     mergePageInfo,
     formatBooking,
-    getTypeSeccionPage
+    getTypeSeccionPage,
+    getUrlFromPageData,
+    getLoadedOn,
+    getPreviousUrl
 };
 
 /**
@@ -100,4 +103,36 @@ function getTypeSeccionPage(url) {
     }
 
     return typeName;
+}
+
+/**
+ * Get url page from page data
+ *
+ * @param {object} pageData
+ * @returns {string} url
+ */
+function getUrlFromPageData(pageData) {
+    const pageInfo = pageData.data.page[0];
+    return pageInfo.url;
+}
+
+/**
+ * Get loaded on time for a page
+ *
+ * @param {object} pageData
+ * @returns {integer} Page loaded on
+ */
+function getLoadedOn(pageData) {
+    return pageData.data.loadedOn;
+}
+
+/**
+ * Get previous url
+ *
+ * @param {object} pageData
+ * @returns {string} previous url
+ */
+function getPreviousUrl(pageData) {
+    const pageInfo = pageData.data.page[0];
+    return pageInfo.previousURL;
 }
