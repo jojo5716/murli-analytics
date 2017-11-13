@@ -38,7 +38,9 @@ function generateBasicMetricPageSchema(url) {
         atHours: [],
         users: [],
         previousUrl: [],
-        devices: {}
+        devices: {},
+        countries: {},
+        metaData: {}
     }
 }
 
@@ -64,10 +66,10 @@ function userAgentDeviceInfo(userAgentInfo) {
         deviceName: userAgentInfo.device.vendor,
 
         browserName: userAgentInfo.browser.name,
-        browserVersion: userAgentInfo.browser.version.replaceAll('.', '-'),
+        browserVersion: userAgentInfo.browser.version.replaceAll('.', '#'),
 
         osName: userAgentInfo.os.name,
-        osVersion: userAgentInfo.os.version.replace('.', '-')
+        osVersion: userAgentInfo.os.version.replace('.', '#')
     };
 }
 
@@ -124,6 +126,16 @@ function updateDeviceVisit(devicesPage, pageData) {
     return deviceListClone;
 }
 
+function updateCountriesVisit(countries, countryVisit) {
+    if (!countries[countryVisit]) {
+        countries[countryVisit] = 0;
+    }
+
+    countries[countryVisit] += 1;
+
+    return countries;
+}
+
 /**
  * Update a page visit metric
  *
@@ -136,13 +148,15 @@ function updateMetricPageContent(metricPage, pageData) {
     const loadedOn = pageDataHelper.getLoadedOn(pageData);
     const previousUrl = pageDataHelper.getPreviousUrl(pageData);
     const hourVisit = pageDataHelper.getAtHourVisit(loadedOn);
+    const countryVisit = pageDataHelper.getCountry(pageData);
 
     metricPage.visits += 1;
     metricPage.atHours.push(hourVisit);
     metricPage.previousUrl.push(previousUrl);
     metricPage.users.push(pageData.userID);
     metricPage.devices = updateDeviceVisit(metricPage.devices, pageData);
-
+    metricPage.countries = updateCountriesVisit(metricPage.countries, countryVisit);
+    metricPage.metaData = pageDataHelper.setMetaDatasAttr(metricPage.metaData, pageData);
     // TODO: pais y metaDatas, acciones y reservas.
     return metricPage;
 }

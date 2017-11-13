@@ -4,7 +4,9 @@ module.exports = {
     getUrlFromPageData,
     getLoadedOn,
     getPreviousUrl,
-    getUserAgent
+    getUserAgent,
+    getCountry,
+    setMetaDatasAttr
 }
 
 
@@ -57,4 +59,46 @@ function getPreviousUrl(pageData) {
  */
 function getUserAgent(pageData) {
     return pageData.data.enviroment[0].userAgent;
+}
+
+/**
+ * Get Country from pageData
+ *
+ * @param {object} pageData
+ * @returns {string} Country
+ */
+function getCountry(pageData) {
+    const userData = pageData.data.userInfo;
+    const countryData = userData.filter((item) => item.key == 'country')[0];
+
+    return countryData.value;
+}
+
+
+function setMetaDatasAttr(metricMetaData, pageData) {
+    const metaDatas = pageData.data.metaData;
+
+    console.log(`metaDatas: ${metaDatas}`);
+    for (let i = 0; i < metaDatas.length; i += 1) {
+        const metaData = metaDatas[i];
+
+
+        const metaDataName = metaData.key.replaceAll('.', '#');
+        const metaDataValue = metaData.value.replaceAll('.', '#');;
+
+        console.log(`metaDataName: ${metaDataName}`);
+        console.log(`metaDataValue: ${metaDataValue}`);
+
+        if (!metricMetaData[metaDataName]) {
+            metricMetaData[metaDataName] = {};
+        }
+
+        if (!metricMetaData[metaDataName][metaDataValue]) {
+            metricMetaData[metaDataName][metaDataValue] = 0;
+        }
+
+        metricMetaData[metaDataName][metaDataValue] += 1;
+    }
+
+    return metricMetaData;
 }

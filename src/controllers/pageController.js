@@ -64,6 +64,7 @@ module.exports = {
         const scrollActions = data.data.scrollActions || [];
 
         const page = await pageService.getByToken(data.data.pageToken);
+
         if (page) {
             for (let i = 0; i < actions.length; i += 1) {
                 page.actions.push(actions[i]);
@@ -75,7 +76,6 @@ module.exports = {
 
             page.save();
         }
-
 
         res.json({ success: true });
     }

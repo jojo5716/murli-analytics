@@ -3,6 +3,8 @@ module.exports = (function modelSchema() {
 
     const objModelSchema = {
         devices: { type: Object, required: true },
+        countries: { type: Object, required: true },
+        metaData: { type: Object },
         previousUrl: { type: Array, default: [] },
         atHours: { type: Array, default: [] },
         users: { type: Array, default: [] },
