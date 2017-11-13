@@ -2,6 +2,7 @@ const restify = require('restify');
 const kue = require('kue');
 
 require('./workers/listeners');
+require('./prototypes');
 
 const config = require('../config');
 

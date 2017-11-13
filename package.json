@@ -4,7 +4,9 @@
   "description": "Backend service to visitor-guest",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon src/app.js"
+    "start": "pm2 start src/app.js --name='murli-analytics'",
+    "start:dev": "nodemon src/app.js",
+    "lint": "eslint ."
   },
   "author": "Jonathan Rodríguez Alejos",
   "license": "ISC",
@@ -14,9 +16,12 @@
     "mongoose": "^4.8.4",
     "promise": "^7.1.1",
     "restify": "^4.3.0",
+    "ua-parser-js": "^0.7.17",
+    "user-agent-parser": "^0.6.0",
     "uuid": "^3.0.1"
   },
   "devDependencies": {
-    "nodemon": "^1.11.0"
+    "nodemon": "^1.11.0",
+    "pm2": "^2.7.2"
   }
 }

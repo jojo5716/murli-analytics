@@ -103,6 +103,5 @@ async function getAllByCreationDate(dateFrom, dateTo, project, page = 1) {
         .limit(PAGE_SIZE)
         .sort({ createAt: 1 });
 
-    console.log(navigations)
     return navigations;
 }

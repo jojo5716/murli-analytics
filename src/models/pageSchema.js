@@ -9,7 +9,8 @@ module.exports = (function pageSchema() {
         loadedOn: { type: Number, required: false },
         pageToken: { type: String, required: true },
         metaData: { type: Array, default: [] },
-        actions: { type: Array, default: [] }
+        actions: { type: Array, default: [] },
+        scrollActions: { type: Array, default: [] }
     };
 
     const collectionName = 'Page';

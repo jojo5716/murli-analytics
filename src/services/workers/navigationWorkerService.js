@@ -1,5 +1,6 @@
 const kue = require('kue');
 const pageMetricSchema = require('../../models/metrics/pageMetricSchema');
+const pageVisitSchema = require('../../models/metrics/pageVisitSchema');
 
 const queue = kue.createQueue();
 
@@ -7,15 +8,57 @@ const queue = kue.createQueue();
 module.exports = {
     findMetricRowByType,
     create,
-    accumulateMetricsPageVisit
+    accumulateMetricsPageVisit,
+    createPageVisit,
+    findPageVisitByID,
+    updatePage
 }
 
 async function findMetricRowByType(project, type) {
-    return await pageMetricSchema.findOne({ project, type });
+    return await pageMetricSchema
+        .findOne({ project, type })
+        .populate('pages');
 }
 
+/**
+ * Create a new page Metric model
+ *
+ * @param {object} args
+ * @returns {object} Metric page
+ */
 async function create(args) {
     return await pageMetricSchema.create(args);
+}
+
+/**
+ * Create a new page visit metrics
+ *
+ * @param {object} args
+ * @returns {object} Page visit model
+ */
+async function createPageVisit(args) {
+    return await pageVisitSchema.create(args);
+}
+
+/**
+ * Find and return an page visit model from ID
+ *
+ * @param {integer} pageVisitID
+ * @returns {object} Page visit
+ */
+async function findPageVisitByID(pageVisitID) {
+    return await pageVisitSchema.findOne({ _id: pageVisitID });
+}
+
+/**
+ * Update a page visit model
+ *
+ * @param {string} url
+ * @param {object} pageVisitUpdated
+ * @returns {object} Page visit
+ */
+async function updatePage(url, pageVisitUpdated) {
+    return await pageVisitSchema.update({ 'url': url }, pageVisitUpdated );
 }
 
 /**
@@ -24,6 +67,9 @@ async function create(args) {
  * Metrics to accumulate:
  *    Url visits (integer)
  *    Previous url visited (integer)
+ *    Device visit info
+ *    Bookings
+ *    Country visits
  *
  * @param {string} userID
  * @param {object} data

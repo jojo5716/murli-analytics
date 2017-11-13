@@ -5,7 +5,7 @@ module.exports = (function metricPageSchema() {
         type: { type: String, required: true },
         project: { type: String, required: true },
         createAt: { type: Date, default: Date.now },
-        pages: { type: Array, default: [] },
+        pages: [{ type: mongoose.Schema.Types.ObjectId, ref: 'PageVisits' }],
     };
 
     const collectionName = 'MetricPage';

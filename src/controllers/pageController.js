@@ -47,6 +47,9 @@ module.exports = {
             }
 
             navigationWorkerService.accumulateMetricsPageVisit(user._id, data);
+        } else {
+            console.log(`Project: ${project} (${data.project})`);
+            console.log(`Data: ${data}`);
         }
     },
 
@@ -57,13 +60,22 @@ module.exports = {
     saveAction: async (req, res) => {
         const data = JSON.parse(req.body);
 
-        const page = await pageService.getByToken(data.data.pageToken);
+        const actions = data.data.actions || [];
+        const scrollActions = data.data.scrollActions || [];
 
-        for (let i = 0; i < data.data.actions.length; i += 1) {
-            page.actions.push(data.data.actions[i]);
+        const page = await pageService.getByToken(data.data.pageToken);
+        if (page) {
+            for (let i = 0; i < actions.length; i += 1) {
+                page.actions.push(actions[i]);
+            }
+
+            for (let i = 0; i < scrollActions.length; i += 1) {
+                page.scrollActions.push(scrollActions[i]);
+            }
+
+            page.save();
         }
 
-        page.save();
 
         res.json({ success: true });
     }

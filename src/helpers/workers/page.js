@@ -1,21 +1,27 @@
-const pageHelper = require('../../helpers/page');
+const UAParser = require('ua-parser-js');
+const pageDataHelper = require('../../helpers/pageData');
+
+const parser = new UAParser();
 
 
 module.exports = {
-    getAtHourVisit,
     generateBasicMetricPageSchema,
-    updateMetricPageContent
+    updateMetricPageContent,
+    updateDeviceVisit,
+    generateNewPageVisit
 }
 
-
 /**
- * Return an hour integer from milliseconds time
+ * Generate a new page visit model
  *
- * @param {float} pageLoadedOn
- * @returns {integer} Hour
+ * @param {object} pageData
+ * @returns {object} Page visit
  */
-function getAtHourVisit(pageLoadedOn) {
-    return new Date(pageLoadedOn).getHours();
+function generateNewPageVisit(pageData) {
+    const url = pageDataHelper.getUrlFromPageData(pageData);
+    const metricPage = generateBasicMetricPageSchema(url);
+
+    return updateMetricPageContent(metricPage, pageData);
 }
 
 /**
@@ -31,19 +37,112 @@ function generateBasicMetricPageSchema(url) {
         users: [],
         atHours: [],
         users: [],
-        previousUrl: []
+        previousUrl: [],
+        devices: {}
     }
 }
 
+/**
+ * Get information about user agent
+ * Return an object with os name, version, browser info, etc..
+ * @param {string} userAgent
+ * @returns {object} User name data
+ */
+function getUserAgentInfo(userAgent) {
+    return parser.setUA(userAgent).getResult()
+}
+
+/**
+ * Return an object with a basic user agent data
+ *
+ * @param {object} userAgentInfo
+ * @returns {object} User agent basic data
+ */
+function userAgentDeviceInfo(userAgentInfo) {
+    return {
+        deviceModel: userAgentInfo.device.model,
+        deviceName: userAgentInfo.device.vendor,
+
+        browserName: userAgentInfo.browser.name,
+        browserVersion: userAgentInfo.browser.version.replaceAll('.', '-'),
+
+        osName: userAgentInfo.os.name,
+        osVersion: userAgentInfo.os.version.replace('.', '-')
+    };
+}
+
+/**
+ * Update an object of devices visits
+ *
+ * @param {object} devicesPage
+ * @param {object} pageData
+ * @returns {object} Devices visits
+ */
+function updateDeviceVisit(devicesPage, pageData) {
+    const deviceListClone = Object.assign({}, devicesPage);
+    const userAgent = pageDataHelper.getUserAgent(pageData);
+    const userAgentInfo = getUserAgentInfo(userAgent);
+
+    // Getting all browser and os info
+
+    const {
+        deviceModel,
+        deviceName,
+        browserName,
+        browserVersion,
+        osName,
+        osVersion
+    } = userAgentDeviceInfo(userAgentInfo);
+
+    if (!deviceListClone[deviceName]) {
+        deviceListClone[deviceName] = {};
+    }
+
+    if (!deviceListClone[deviceName][deviceModel]) {
+        deviceListClone[deviceName][deviceModel] = {};
+    }
+
+    if (!deviceListClone[deviceName][deviceModel][osName]) {
+        deviceListClone[deviceName][deviceModel][osName] = {};
+    }
+
+    if (!deviceListClone[deviceName][deviceModel][osName][osVersion]) {
+        deviceListClone[deviceName][deviceModel][osName][osVersion] = {};
+    }
+
+    if (!deviceListClone[deviceName][deviceModel][osName][osVersion][browserName]) {
+        deviceListClone[deviceName][deviceModel][osName][osVersion][browserName] = {};
+    }
+
+    if (!deviceListClone[deviceName][deviceModel][osName][osVersion][browserName][browserVersion]) {
+        deviceListClone[deviceName][deviceModel][osName][osVersion][browserName][browserVersion] = 0;
+    }
+
+    // Increment a new visit for the device
+    deviceListClone[deviceName][deviceModel][osName][osVersion][browserName][browserVersion] += 1;
+
+    return deviceListClone;
+}
+
+/**
+ * Update a page visit metric
+ *
+ * @param {object} metricPage
+ * @param {object} pageData
+ * @returns {object} Metric page updated
+ */
 function updateMetricPageContent(metricPage, pageData) {
-    const metricPageClone = Object.assign({}, metricPage);
-    const loadedOn = pageHelper.getLoadedOn(pageData);
+    // Getting all data from pageData
+    const loadedOn = pageDataHelper.getLoadedOn(pageData);
+    const previousUrl = pageDataHelper.getPreviousUrl(pageData);
+    const hourVisit = pageDataHelper.getAtHourVisit(loadedOn);
 
-    metricPageClone.visits += 1;
-    metricPageClone.atHours.push(getAtHourVisit(loadedOn));
-    metricPageClone.previousUrl.push(pageHelper.getPreviousUrl(pageData));
-    metricPageClone.users.push(pageData.userID);
+    metricPage.visits += 1;
+    metricPage.atHours.push(hourVisit);
+    metricPage.previousUrl.push(previousUrl);
+    metricPage.users.push(pageData.userID);
+    metricPage.devices = updateDeviceVisit(metricPage.devices, pageData);
 
-    // TODO: Guardar información sobre el dispositivo, navegador, pais y metaDatas, acciones y reservas.
-    return metricPageClone;
+    // TODO: pais y metaDatas, acciones y reservas.
+    return metricPage;
 }
