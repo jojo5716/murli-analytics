@@ -4,6 +4,8 @@ const navigationWorkerService = require('../services/workers/navigationWorkerSer
 const projectService = require('../services/projectService');
 const { getTypeSeccionPage } = require('../helpers/page');
 const { getUrlFromPageData } = require('../helpers/pageData');
+const workerActionHelper = require('../helpers/workers/actions');
+
 
 const {
     getAtHourVisit,
@@ -13,8 +15,14 @@ const {
     generateNewPageVisit
  } = require('../helpers/workers/page');
 
+const workerActionUpdater = {
+    'change currency': workerActionHelper.saveChangeCurrencyAction,
+    'add room': workerActionHelper.saveAddRoomAction
+};
+
 module.exports = {
-    accumulateMetricsPageVisit
+    accumulateMetricsPageVisit,
+    accumulateMetricsPageActions
 }
 
 /**
@@ -47,9 +55,8 @@ async function accumulateMetricsPageVisit(pageData, done) {
         if (indexPage !== -1) {
             // Update
             const currentPage = metric.pages[indexPage];
-            const pageVisit = await navigationWorkerService.findPageVisitByID(currentPage._id);
-            const pageVisitUpdated = updateMetricPageContent(pageVisit, pageData);
-
+            const pageVisitUpdated = updateMetricPageContent(currentPage, pageData);
+            console.log(pageVisitUpdated)
             await navigationWorkerService.updatePage(url, pageVisitUpdated);
         } else {
             // New page visit
@@ -63,3 +70,32 @@ async function accumulateMetricsPageVisit(pageData, done) {
 
     done();
 }
+
+
+
+async function accumulateMetricsPageActions(pageData, done) {
+    const actions = pageData.data.actions || [];
+    const url = getUrlFromPageData(pageData);
+    const page = await navigationWorkerService.findPageVisitByID(url);
+    console.log(".....")
+    const x = {};
+    x['2.2'] =3;
+
+    if (page) {
+        for (let i = 0; i < actions.length; i += 1) {
+            const action = actions[i];
+            const actionName = action.key;
+            const actionValue = JSON.parse(action.value);
+            const updater = workerActionUpdater[actionName];
+
+            page.actions[actionName] = updater(page.actions[actionName], actionValue);
+        }
+
+        await navigationWorkerService.updatePage(url, page);
+
+    }
+
+    done();
+}
+
+

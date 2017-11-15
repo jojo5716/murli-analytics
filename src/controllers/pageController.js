@@ -30,10 +30,13 @@ module.exports = {
     *
     */
     trackPage: async (req, res) => {
-        const data = JSON.parse(req.body || null);
+        const data = req.body;
+
+        if (!data) return res.json({ success: false });
+
         const project = await projectService.getById(data.project);
 
-        if (project && data) {
+        if (project) {
             const sessionTemp = data.data.sessionTemp;
             const user = await userService.getUserOrCreate(data);
             const navigation = await navigationService.getByProject(project._id, sessionTemp);
@@ -51,6 +54,8 @@ module.exports = {
             console.log(`Project: ${project} (${data.project})`);
             console.log(`Data: ${data}`);
         }
+
+        res.json({ success: true });
     },
 
     /**
@@ -59,7 +64,6 @@ module.exports = {
      */
     saveAction: async (req, res) => {
         const data = JSON.parse(req.body);
-
         const actions = data.data.actions || [];
         const scrollActions = data.data.scrollActions || [];
 
@@ -76,6 +80,20 @@ module.exports = {
 
             page.save();
         }
+
+        navigationWorkerService.accumulateMetricsPageActions(data);
+
+        res.json({ success: true });
+    },
+
+    deleteAllJobs: (req, res) => {
+        kue.Job.rangeByState('active', 0, 200, 'asc', function (err, jobs) {
+            jobs.forEach(function (job) {
+                job.remove(function () {
+                    console.log('removed ', job.id);
+                });
+            });
+        });
 
         res.json({ success: true });
     }

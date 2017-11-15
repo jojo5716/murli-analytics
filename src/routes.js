@@ -8,6 +8,7 @@ module.exports = (app) => {
     app.post('/project', projectController.createProject);
     app.post('/actions', pageController.saveAction);
     app.post('/track', pageController.trackPage);
+    app.get('/delete-jobs', pageController.deleteAllJobs);
 
     // API Rest
 

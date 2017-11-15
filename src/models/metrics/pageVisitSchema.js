@@ -5,9 +5,10 @@ module.exports = (function modelSchema() {
         devices: { type: Object, required: true },
         countries: { type: Object, required: true },
         metaData: { type: Object },
+        actions: { type: Object, default: {} },
         previousUrl: { type: Array, default: [] },
         atHours: { type: Array, default: [] },
-        users: { type: Array, default: [] },
+        users: { type: Object, required: true },
         visits: { type: Number, default: 1 },
         url: { type: String, required: true }
     };
@@ -18,3 +19,4 @@ module.exports = (function modelSchema() {
 
     return objModel;
 })();
+

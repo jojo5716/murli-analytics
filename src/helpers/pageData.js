@@ -74,20 +74,20 @@ function getCountry(pageData) {
     return countryData.value;
 }
 
-
+/**
+ * Save all metaData into a page visit metric like attrs of the own object
+ *
+ * @param {object} metricMetaData
+ * @param {object} pageData
+ * @returns {object} Metadata object
+ */
 function setMetaDatasAttr(metricMetaData, pageData) {
     const metaDatas = pageData.data.metaData;
 
-    console.log(`metaDatas: ${metaDatas}`);
     for (let i = 0; i < metaDatas.length; i += 1) {
         const metaData = metaDatas[i];
-
-
         const metaDataName = metaData.key.replaceAll('.', '#');
         const metaDataValue = metaData.value.replaceAll('.', '#');;
-
-        console.log(`metaDataName: ${metaDataName}`);
-        console.log(`metaDataValue: ${metaDataValue}`);
 
         if (!metricMetaData[metaDataName]) {
             metricMetaData[metaDataName] = {};

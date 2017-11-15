@@ -34,13 +34,13 @@ function generateBasicMetricPageSchema(url) {
     return {
         url,
         visits: 0,
-        users: [],
+        users: {},
         atHours: [],
-        users: [],
         previousUrl: [],
         devices: {},
         countries: {},
-        metaData: {}
+        metaData: {},
+        actions: {}
     }
 }
 
@@ -136,6 +136,16 @@ function updateCountriesVisit(countries, countryVisit) {
     return countries;
 }
 
+function updateUserVisit(userVisits, userID) {
+    if (!userVisits[userID]) {
+        userVisits[userID] = 0;
+    }
+
+    userVisits[userID] += 1;
+
+    return userVisits;
+}
+
 /**
  * Update a page visit metric
  *
@@ -153,10 +163,11 @@ function updateMetricPageContent(metricPage, pageData) {
     metricPage.visits += 1;
     metricPage.atHours.push(hourVisit);
     metricPage.previousUrl.push(previousUrl);
-    metricPage.users.push(pageData.userID);
+    metricPage.users = updateUserVisit(metricPage.users, pageData.userID);
     metricPage.devices = updateDeviceVisit(metricPage.devices, pageData);
     metricPage.countries = updateCountriesVisit(metricPage.countries, countryVisit);
     metricPage.metaData = pageDataHelper.setMetaDatasAttr(metricPage.metaData, pageData);
-    // TODO: pais y metaDatas, acciones y reservas.
+    metricPage.actions = {};
+    // TODO: reservas.
     return metricPage;
 }
