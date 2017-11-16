@@ -10,7 +10,8 @@ module.exports = (function modelSchema() {
         atHours: { type: Object, required: true },
         users: { type: Object, required: true },
         visits: { type: Object, required: true },
-        url: { type: String, required: true }
+        url: { type: String, required: true },
+        availabilities: { type: Array, default: [] },
     };
 
     const collectionName = 'PageVisits';

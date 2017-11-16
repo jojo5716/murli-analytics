@@ -111,6 +111,7 @@ async function accumulateMetricsPageActions(pageData, done) {
 
 
 async function accumulateMetricsBookings(navigationData, done) {
-    console.log("Acumulando bookings...")
+    // console.log("Acumulando bookings...")
+    // console.log(navigationData);
     done();
 }

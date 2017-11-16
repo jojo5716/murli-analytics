@@ -4,7 +4,8 @@ const moment = require('moment');
 module.exports = {
     getTodayHumanDate,
     getCurrentMonth,
-    getCurrentYear
+    getCurrentYear,
+    getCurrentTime
 };
 
 /**
@@ -24,3 +25,8 @@ function getCurrentMonth() {
 function getCurrentYear() {
     return moment().format('YYYY');
 }
+
+function getCurrentTime() {
+    return moment().format('HH:mm');
+}
+

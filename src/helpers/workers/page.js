@@ -5,10 +5,10 @@ const workerUpdater = require('../../helpers/workers/updaters');
 
 
 module.exports = {
-    generateBasicMetricPageSchema,
     generateNewPageVisit,
-    updateMetricPageContent
-}
+    updateMetricPageContent,
+    initializerMetricDateTime
+};
 
 /**
  * Generate a new page visit model
@@ -39,10 +39,23 @@ function generateBasicMetricPageSchema(url) {
         devices: {},
         countries: {},
         metaData: {},
-        actions: {}
+        actions: {},
+        availabilities: {}
     }
 }
 
+function initializerMetricDateTime(today, metricObject, timeValue) {
+    if (!metricObject[today.stringDate]) {
+        metricObject[today.stringDate] = 0;
+    }
+
+    if (!metricObject[today.stringDate][today.currentTime]) {
+        metricObject[today.stringDate][today.currentTime] = timeValue;
+    }
+
+    return metricObject;
+
+}
 
 /**
  * Update a page visit metric
@@ -53,17 +66,20 @@ function generateBasicMetricPageSchema(url) {
  */
 function updateMetricPageContent(metricPage, pageData) {
     // Today human date format
-    const today = timeHelper.getTodayHumanDate();
+    const today = {
+        stringDate: timeHelper.getTodayHumanDate(),
+        currentTime:timeHelper.getCurrentTime()
+    };
 
     metricPage.visits = workerUpdater.updateTotalVisits(today, metricPage.visits);
-    metricPage.atHours = workerUpdater.updateHoursVisits(today, metricPage.atHours, pageData);
+    metricPage.atHours = workerUpdater.updateHoursVisits(today, metricPage.atHours);
     metricPage.previousUrl = workerUpdater.updatePreviousURLVisits(today, metricPage.previousUrl, pageData);
 
     metricPage.users = workerUpdater.updateUserVisit(today, metricPage.users, pageData.userID);
     metricPage.devices = workerUpdater.updateDeviceVisit(today,metricPage.devices, pageData);
     metricPage.countries = workerUpdater.updateCountriesVisit(today, metricPage.countries, pageData);
     metricPage.metaData = workerUpdater.updateMetaDatasAttr(today, metricPage.metaData, pageData);
-    metricPage.availabilityInfo = workerUpdater.updateAvailabilityInfo(metricPage.availability, pageData);
+    metricPage.availabilityInfo = workerUpdater.updateAvailabilityInfo(today, metricPage.availabilities, pageData);
     metricPage.actions = {};
 
     // TODO: reservas.
