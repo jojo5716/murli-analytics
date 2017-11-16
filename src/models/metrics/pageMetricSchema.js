@@ -5,6 +5,8 @@ module.exports = (function metricPageSchema() {
         type: { type: String, required: true },
         project: { type: String, required: true },
         createAt: { type: Date, default: Date.now },
+        month: { type: String, required: true },
+        year: { type: String, required: true },
         pages: [{ type: mongoose.Schema.Types.ObjectId, ref: 'PageVisits' }],
     };
 

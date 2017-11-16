@@ -5,7 +5,7 @@ const projectService = require('../services/projectService');
 const userService = require('../services/userService');
 const navigationService = require('../services/navigationService');
 
-const { getUserOrCreate } = require('../helpers/user');
+const { mergePageInfo } = require('../helpers/page');
 const navigationWorkerService = require('../services/workers/navigationWorkerService');
 
 
@@ -30,29 +30,31 @@ module.exports = {
     *
     */
     trackPage: async (req, res) => {
-        const data = req.body;
+        const pageData = req.body;
 
-        if (!data) return res.json({ success: false });
+        if (!pageData) return res.json({ success: false });
 
-        const project = await projectService.getById(data.project);
+        const project = await projectService.getById(pageData.project);
 
         if (project) {
-            const sessionTemp = data.data.sessionTemp;
-            const user = await userService.getUserOrCreate(data);
+            const sessionTemp = pageData.data.sessionTemp;
+            const user = await userService.getUserOrCreate(pageData);
             const navigation = await navigationService.getByProject(project._id, sessionTemp);
-
+            let currentNavigation;
             if (navigation) {
                 // Then is not the first time thant user visit a page
                 // and we need to update the pages model.
-                pageService.updatePage(navigation, data);
+                currentNavigation = await pageService.updatePage(navigation, pageData);
             } else {
-                navigationService.createNavigation(data, user, project._id);
+                const page = await pageService.create(mergePageInfo(pageData));
+                currentNavigation = await navigationService.createNavigation(pageData, user, project._id, page);
             }
 
-            navigationWorkerService.accumulateMetricsPageVisit(user._id, data);
+            navigationWorkerService.accumulateMetricsPageVisit(user._id, pageData);
+            navigationWorkerService.accumulateMetricsBookings(currentNavigation, pageData);
         } else {
-            console.log(`Project: ${project} (${data.project})`);
-            console.log(`Data: ${data}`);
+            console.log(`Project: ${project} (${pageData.project})`);
+            console.log(`pageData: ${pageData}`);
         }
 
         res.json({ success: true });
@@ -63,11 +65,11 @@ module.exports = {
      *
      */
     saveAction: async (req, res) => {
-        const data = JSON.parse(req.body);
-        const actions = data.data.actions || [];
-        const scrollActions = data.data.scrollActions || [];
+        const pageData = req.body;
+        const actions = pageData.data.actions || [];
+        const scrollActions = pageData.data.scrollActions || [];
 
-        const page = await pageService.getByToken(data.data.pageToken);
+        const page = await pageService.getByToken(pageData.data.pageToken);
 
         if (page) {
             for (let i = 0; i < actions.length; i += 1) {
@@ -81,7 +83,7 @@ module.exports = {
             page.save();
         }
 
-        navigationWorkerService.accumulateMetricsPageActions(data);
+        navigationWorkerService.accumulateMetricsPageActions(pageData);
 
         res.json({ success: true });
     },

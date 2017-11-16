@@ -1,17 +1,12 @@
-const pageMetricSchema = require('../models/metrics/pageMetricSchema');
-const pageVisitSchema = require('../models/metrics/pageVisitSchema');
 const navigationWorkerService = require('../services/workers/navigationWorkerService');
-const projectService = require('../services/projectService');
 const { getTypeSeccionPage } = require('../helpers/page');
 const { getUrlFromPageData } = require('../helpers/pageData');
 const workerActionHelper = require('../helpers/workers/actions');
+const timeHelper = require('../helpers/time');
 
 
 const {
-    getAtHourVisit,
-    generateBasicMetricPageSchema,
     updateMetricPageContent,
-    updateDeviceVisit,
     generateNewPageVisit
  } = require('../helpers/workers/page');
 
@@ -22,8 +17,9 @@ const workerActionUpdater = {
 
 module.exports = {
     accumulateMetricsPageVisit,
-    accumulateMetricsPageActions
-}
+    accumulateMetricsPageActions,
+    accumulateMetricsBookings
+};
 
 /**
  * When a user visit a page, we need to accumulate all data about
@@ -34,9 +30,19 @@ module.exports = {
 async function accumulateMetricsPageVisit(pageData, done) {
     const url = getUrlFromPageData(pageData);
     const project = pageData.project;
+    const currentMonth = timeHelper.getCurrentMonth();
+    const currentYear = timeHelper.getCurrentYear();
+
     // Get page type (content, availability, no-availability...)
     const pageType = getTypeSeccionPage(url);
-    const metric = await navigationWorkerService.findMetricRowByType(project, pageType);
+    const metricQuery = {
+        month: currentMonth,
+        year: currentYear,
+        type: pageType,
+        project,
+    };
+
+    const metric = await navigationWorkerService.findMetricRowByQuery(metricQuery);
 
     if (!metric) {
         const metricPage = generateNewPageVisit(pageData);
@@ -45,7 +51,9 @@ async function accumulateMetricsPageVisit(pageData, done) {
         const metricObj = {
             project,
             type: pageType,
-            pages: [pageVisitModel]
+            pages: [pageVisitModel],
+            month: currentMonth,
+            year: currentYear
         };
 
         navigationWorkerService.create(metricObj);
@@ -56,7 +64,6 @@ async function accumulateMetricsPageVisit(pageData, done) {
             // Update
             const currentPage = metric.pages[indexPage];
             const pageVisitUpdated = updateMetricPageContent(currentPage, pageData);
-            console.log(pageVisitUpdated)
             await navigationWorkerService.updatePage(url, pageVisitUpdated);
         } else {
             // New page visit
@@ -72,23 +79,25 @@ async function accumulateMetricsPageVisit(pageData, done) {
 }
 
 
-
 async function accumulateMetricsPageActions(pageData, done) {
     const actions = pageData.data.actions || [];
     const url = getUrlFromPageData(pageData);
-    const page = await navigationWorkerService.findPageVisitByID(url);
-    console.log(".....")
-    const x = {};
-    x['2.2'] =3;
+    const page = await navigationWorkerService.findPageVisitByURL(url);
+    const today = timeHelper.getTodayHumanDate();
 
     if (page) {
+        if (!page.actions[today]) {
+            page.actions[today] = {};
+        }
+
         for (let i = 0; i < actions.length; i += 1) {
             const action = actions[i];
             const actionName = action.key;
             const actionValue = JSON.parse(action.value);
             const updater = workerActionUpdater[actionName];
 
-            page.actions[actionName] = updater(page.actions[actionName], actionValue);
+
+            page.actions[today][actionName] = updater(page.actions[today][actionName], actionValue);
         }
 
         await navigationWorkerService.updatePage(url, page);
@@ -99,3 +108,9 @@ async function accumulateMetricsPageActions(pageData, done) {
 }
 
 
+
+
+async function accumulateMetricsBookings(navigationData, done) {
+    console.log("Acumulando bookings...")
+    done();
+}

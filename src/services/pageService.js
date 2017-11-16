@@ -1,5 +1,5 @@
 const pageSchema = require('../models/pageSchema');
-const navigationSchema = require('../models/navigationSchema');
+const navigationService = require('../services/navigationService');
 const { mergePageInfo, formatBooking } = require('../helpers/page');
 
 module.exports = {
@@ -49,10 +49,15 @@ async function updatePage(navigation, data) {
 
     // Pushing the new page into navigation
     navigation.pages.push(newPage);
+    navigation.bookings = insertOrUpdateBooking(navigation.bookings, data.data.booking);
 
-    insertOrUpdateBooking(navigation, data.data.booking);
+    navigationService.updateNavigationPage(
+        navigation._id,
+        navigation.bookings,
+        navigation.pages
+    );
 
-    navigation.save();
+    return navigation;
 
 }
 
@@ -63,20 +68,22 @@ async function updatePage(navigation, data) {
  * @param {object} navigation
  * @param {any} booking
  */
-function insertOrUpdateBooking(navigation, booking) {
-    if (booking.length !== 0) {
-        const booking = formatBooking(booking);
+function insertOrUpdateBooking(navigationBookings, dataBooking) {
+    if (dataBooking.length !== 0) {
+        const booking = formatBooking(dataBooking);
 
         if (bookingIsNotABonoVisit(booking)) {
-            const index = navigation.bookings.findIndex(each => each.bookingCode === booking.bookingCode);
+            const index = navigationBookings.findIndex(each => each.bookingCode === booking.bookingCode);
 
             if (index !== -1) {
-                navigation.bookings[index] = booking;
+                navigationBookings[index] = booking;
             } else {
-                navigation.bookings.push(booking);
+                navigationBookings.push(booking);
             }
         }
     }
+
+    return navigationBookings;
 }
 
 function bookingIsNotABonoVisit(booking) {

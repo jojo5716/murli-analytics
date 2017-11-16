@@ -10,6 +10,7 @@ module.exports = {
      * @param {any} res
     */
     createProject: async(req, res) => {
+        console.log(req.body)
         let name = req.body.name;
 
         const project = await projectSchema.create({ name });

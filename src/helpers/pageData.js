@@ -5,8 +5,7 @@ module.exports = {
     getLoadedOn,
     getPreviousUrl,
     getUserAgent,
-    getCountry,
-    setMetaDatasAttr
+    getCountry
 }
 
 
@@ -72,33 +71,4 @@ function getCountry(pageData) {
     const countryData = userData.filter((item) => item.key == 'country')[0];
 
     return countryData.value;
-}
-
-/**
- * Save all metaData into a page visit metric like attrs of the own object
- *
- * @param {object} metricMetaData
- * @param {object} pageData
- * @returns {object} Metadata object
- */
-function setMetaDatasAttr(metricMetaData, pageData) {
-    const metaDatas = pageData.data.metaData;
-
-    for (let i = 0; i < metaDatas.length; i += 1) {
-        const metaData = metaDatas[i];
-        const metaDataName = metaData.key.replaceAll('.', '#');
-        const metaDataValue = metaData.value.replaceAll('.', '#');;
-
-        if (!metricMetaData[metaDataName]) {
-            metricMetaData[metaDataName] = {};
-        }
-
-        if (!metricMetaData[metaDataName][metaDataValue]) {
-            metricMetaData[metaDataName][metaDataValue] = 0;
-        }
-
-        metricMetaData[metaDataName][metaDataValue] += 1;
-    }
-
-    return metricMetaData;
 }

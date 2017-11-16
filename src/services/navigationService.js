@@ -1,6 +1,4 @@
 const navigationSchema = require('../models/navigationSchema');
-const { mergePageInfo } = require('../helpers/page');
-const pageService = require('../services/pageService');
 
 const PAGE_SIZE = 100;
 
@@ -11,7 +9,8 @@ module.exports = {
     getAllByCreationDate,
     getBySession,
     getByProject,
-    createNavigation
+    createNavigation,
+    updateNavigationPage
 };
 
 
@@ -65,11 +64,8 @@ async function getByProject(projectID, sessionTemp) {
  * @param {object} user
  * @param {integer} projectID
  */
-async function createNavigation(data, user, projectID) {
-    const pageData = mergePageInfo(data);
-    const page = await pageService.create(pageData);
-
-    create({
+async function createNavigation(data, user, projectID, page) {
+    return await create({
         sessionTemp: data.data.sessionTemp,
         pages: page,
         project: projectID,
@@ -90,7 +86,7 @@ async function getAllByCreationDate(dateFrom, dateTo, project, page = 1) {
             $gte: dateFrom,
             $lte: dateTo
         }
-    }
+    };
 
     if (project) {
         query.project = project;
@@ -104,4 +100,21 @@ async function getAllByCreationDate(dateFrom, dateTo, project, page = 1) {
         .sort({ createAt: 1 });
 
     return navigations;
+}
+
+/**
+ * Update pages and bookings from navigationPage
+ *
+ * @param {string} id Navigations
+ * @param {array}  bookingsUpdated
+ * @returns {array} pagesUpdated
+ */
+async function updateNavigationPage(id, bookingsUpdated, pagesUpdated) {
+    return await navigationSchema.update({ '_id': id },
+        {
+            $set: {
+                bookings: bookingsUpdated,
+                pages:pagesUpdated
+            }
+        });
 }

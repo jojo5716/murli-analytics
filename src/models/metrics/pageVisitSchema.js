@@ -6,10 +6,10 @@ module.exports = (function modelSchema() {
         countries: { type: Object, required: true },
         metaData: { type: Object },
         actions: { type: Object, default: {} },
-        previousUrl: { type: Array, default: [] },
-        atHours: { type: Array, default: [] },
+        previousUrl: { type: Object, required: true },
+        atHours: { type: Object, required: true },
         users: { type: Object, required: true },
-        visits: { type: Number, default: 1 },
+        visits: { type: Object, required: true },
         url: { type: String, required: true }
     };
 

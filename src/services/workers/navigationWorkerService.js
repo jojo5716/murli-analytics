@@ -1,5 +1,4 @@
 const kue = require('kue');
-const ObjectId = require('mongoose').Types.ObjectId;
 
 const pageMetricSchema = require('../../models/metrics/pageMetricSchema');
 const pageVisitSchema = require('../../models/metrics/pageVisitSchema');
@@ -8,19 +7,20 @@ const queue = kue.createQueue();
 
 
 module.exports = {
-    findMetricRowByType,
     create,
     accumulateMetricsPageVisit,
     accumulateMetricsPageActions,
     createPageVisit,
-    findPageVisitByID,
     updatePage,
-    findPageVisitByID
-}
+    findPageVisitByURL,
+    findMetricRowByQuery,
+    accumulateMetricsBookings
+};
 
-async function findMetricRowByType(project, type) {
+
+async function findMetricRowByQuery(query) {
     return await pageMetricSchema
-        .findOne({ project, type })
+        .findOne(query)
         .populate('pages');
 }
 
@@ -45,22 +45,12 @@ async function createPageVisit(args) {
 }
 
 /**
- * Find and return an page visit model from ID
- *
- * @param {integer} pageVisitID
- * @returns {object} Page visit
- */
-async function findPageVisitByID(pageVisitID) {
-    return await pageVisitSchema.findOne({ _id: new ObjectId(pageVisitID) });
-}
-
-/**
  * Find and return an page visit model from url
  *
  * @param {string} pageURL
  * @returns {object} Page visit
  */
-async function findPageVisitByID(pageURL) {
+async function findPageVisitByURL(pageURL) {
     return await pageVisitSchema.findOne({ url: pageURL });
 }
 
@@ -103,5 +93,11 @@ function accumulateMetricsPageVisit(userID, pageData) {
 function accumulateMetricsPageActions(pageData) {
     queue
         .create('accumulateMetricsPageActions', pageData)
+        .save()
+}
+
+function accumulateMetricsBookings(navigation, booking) {
+    queue
+        .create('accumulateMetricsBookings', {navigation, booking})
         .save()
 }

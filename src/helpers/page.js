@@ -18,6 +18,8 @@ function mergePageInfo(data) {
 
     const metaDatas = data.data.metaData;
     const actions = data.data.actions;
+    const availabilityData = data.data.availability;
+
     const pageInfoCloned = Object.assign({}, pageInfo);
 
     pageInfoCloned.loadedOn = new Date().getTime();
@@ -25,6 +27,8 @@ function mergePageInfo(data) {
 
     initializeAttr(pageInfoCloned, 'metaData', []);
     initializeAttr(pageInfoCloned, 'actions', []);
+    initializeAttr(pageInfoCloned, 'availability', {});
+    pageInfoCloned.availability = availabilityData;
 
     for (const metadata in metaDatas) {
         pageInfoCloned.metaData.push(metaDatas[metadata]);
@@ -97,6 +101,10 @@ function getTypeSeccionPage(url) {
         typeName = 'availability-hotels';
     } else if (url.indexOf('bookcore/no-availability') != -1) {
         typeName = 'no-availability';
+    } else if (url.indexOf('bookcore/confirmation-form') != -1) {
+        typeName = 'confirmation-form';
+    } else if (url.indexOf('bookcore/your-booking/confirmation') != -1) {
+        typeName = 'confirmation-success';
     }
 
     return typeName;
