@@ -7,7 +7,7 @@ const navigationService = require('../services/navigationService');
 
 const { mergePageInfo } = require('../helpers/page');
 const navigationWorkerService = require('../services/workers/navigationWorkerService');
-
+const workerJobs = require('../jobs/index');
 
 const queue = kue.createQueue();
 
@@ -41,17 +41,24 @@ module.exports = {
             const user = await userService.getUserOrCreate(pageData);
             const navigation = await navigationService.getByProject(project._id, sessionTemp);
             let currentNavigation;
+
             if (navigation) {
                 // Then is not the first time thant user visit a page
                 // and we need to update the pages model.
                 currentNavigation = await pageService.updatePage(navigation, pageData);
             } else {
                 const page = await pageService.create(mergePageInfo(pageData));
-                currentNavigation = await navigationService.createNavigation(pageData, user, project._id, page);
+                const navigationQuery = {
+                    sessionTemp,
+                    user,
+                    page,
+                    project: project._id
+                };
+                currentNavigation = await navigationService.createNavigation(navigationQuery);
             }
 
-            navigationWorkerService.accumulateMetricsPageVisit(user._id, pageData);
-            navigationWorkerService.accumulateMetricsBookings(currentNavigation, pageData);
+            workerJobs.accumulateMetricsPageVisit(user._id, pageData);
+            workerJobs.accumulateMetricsBookings(currentNavigation, pageData);
         } else {
             console.log(`Project: ${project} (${pageData.project})`);
             console.log(`pageData: ${pageData}`);
@@ -83,7 +90,7 @@ module.exports = {
             page.save();
         }
 
-        navigationWorkerService.accumulateMetricsPageActions(pageData);
+        workerJobs.accumulateMetricsPageActions(pageData);
 
         res.json({ success: true });
     },

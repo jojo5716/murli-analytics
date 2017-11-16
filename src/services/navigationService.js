@@ -4,7 +4,6 @@ const PAGE_SIZE = 100;
 
 
 module.exports = {
-    create,
     getAll,
     getAllByCreationDate,
     getBySession,
@@ -12,17 +11,6 @@ module.exports = {
     createNavigation,
     updateNavigationPage
 };
-
-
-/**
- * Create new navigation
- *
- * @param {object} args
- * @returns {object} Navigation
- */
-async function create(args) {
-    return await navigationSchema.create(args);
-}
 
 /**
  * Get all navigation
@@ -60,16 +48,15 @@ async function getByProject(projectID, sessionTemp) {
 /**
  * Create a new navigation page
  *
- * @param {object} data
- * @param {object} user
- * @param {integer} projectID
+ * @param {object} query
+ *
  */
-async function createNavigation(data, user, projectID, page) {
-    return await create({
-        sessionTemp: data.data.sessionTemp,
-        pages: page,
-        project: projectID,
-        user
+async function createNavigation(query) {
+    return await navigationSchema.create({
+        sessionTemp: query.sessionTemp,
+        pages: query.page,
+        project: query.project,
+        user: query.user
     });
 }
 

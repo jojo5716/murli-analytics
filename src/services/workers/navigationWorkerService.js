@@ -1,20 +1,13 @@
-const kue = require('kue');
-
 const pageMetricSchema = require('../../models/metrics/pageMetricSchema');
 const pageVisitSchema = require('../../models/metrics/pageVisitSchema');
-
-const queue = kue.createQueue();
 
 
 module.exports = {
     create,
-    accumulateMetricsPageVisit,
-    accumulateMetricsPageActions,
     createPageVisit,
     updatePage,
     findPageVisitByURL,
-    findMetricRowByQuery,
-    accumulateMetricsBookings
+    findMetricRowByQuery
 };
 
 
@@ -63,41 +56,4 @@ async function findPageVisitByURL(pageURL) {
  */
 async function updatePage(url, pageVisitUpdated) {
     return await pageVisitSchema.update({ 'url': url }, pageVisitUpdated);
-}
-
-/**
- * Service to send job to accumulate data about current page visited.
- *
- * Metrics to accumulate:
- *    Url visits (integer)
- *    Previous url visited (integer)
- *    Device visit info
- *    Bookings
- *    Country visits
- *
- * @param {string} userID
- * @param {object} data
- */
-function accumulateMetricsPageVisit(userID, pageData) {
-    const pageDataClone = Object.assign({}, pageData);
-
-    // We need to add the user id to register on the metrics
-    pageDataClone.userID = userID;
-
-    queue
-        .create('accumulateMetricsPageVisit', pageDataClone)
-        .save()
-}
-
-
-function accumulateMetricsPageActions(pageData) {
-    queue
-        .create('accumulateMetricsPageActions', pageData)
-        .save()
-}
-
-function accumulateMetricsBookings(navigation, booking) {
-    queue
-        .create('accumulateMetricsBookings', {navigation, booking})
-        .save()
 }
