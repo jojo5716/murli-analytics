@@ -1,6 +1,6 @@
 const pageDataHelper = require('../../helpers/pageData');
 const { getUserAgentInfo, userAgentDeviceInfo } = require('../../utilities/userAgent');
-const workerHelper = require('../../helpers/workers/page');
+const objectTools = require('../../utilities/objects');
 
 
 module.exports = {
@@ -10,7 +10,6 @@ module.exports = {
     updateMetaDatasAttr,
     updateAvailabilityInfo,
     updateTotalVisits,
-    updateHoursVisits,
     updatePreviousURLVisits
 };
 
@@ -23,7 +22,6 @@ module.exports = {
  * @returns {object} Devices visits
  */
 function updateDeviceVisit(today, devicesPage, pageData) {
-    const deviceListClone = Object.assign({}, devicesPage);
     const userAgent = pageDataHelper.getUserAgent(pageData);
     const userAgentInfo = getUserAgentInfo(userAgent);
 
@@ -38,42 +36,20 @@ function updateDeviceVisit(today, devicesPage, pageData) {
         osVersion
     } = userAgentDeviceInfo(userAgentInfo);
 
-    if (!deviceListClone[today.stringDate]) {
-        deviceListClone[today.stringDate] = {};
-    }
+    const devicesObjectStructure = [
+        today.stringDate,
+        today.currentTime,
+        deviceName,
+        deviceModel,
+        osName,
+        osVersion,
+        browserName,
+        browserVersion
+    ];
 
-    if (!deviceListClone[today.stringDate][today.currentTime]) {
-        deviceListClone[today.stringDate][today.currentTime] = {};
-    }
+    const currentDeviceVisits = objectTools.getValueFromNestedObject(devicesPage, devicesObjectStructure, 0);
 
-    if (!deviceListClone[today.stringDate][today.currentTime][deviceName]) {
-        deviceListClone[today.stringDate][today.currentTime][deviceName] = {};
-    }
-
-    if (!deviceListClone[today.stringDate][today.currentTime][deviceName][deviceModel]) {
-        deviceListClone[today.stringDate][today.currentTime][deviceName][deviceModel] = {};
-    }
-
-    if (!deviceListClone[today.stringDate][today.currentTime][deviceName][deviceModel][osName]) {
-        deviceListClone[today.stringDate][today.currentTime][deviceName][deviceModel][osName] = {};
-    }
-
-    if (!deviceListClone[today.stringDate][today.currentTime][deviceName][deviceModel][osName][osVersion]) {
-        deviceListClone[today.stringDate][today.currentTime][deviceName][deviceModel][osName][osVersion] = {};
-    }
-
-    if (!deviceListClone[today.stringDate][today.currentTime][deviceName][deviceModel][osName][osVersion][browserName]) {
-        deviceListClone[today.stringDate][today.currentTime][deviceName][deviceModel][osName][osVersion][browserName] = {};
-    }
-
-    if (!deviceListClone[today.stringDate][today.currentTime][deviceName][deviceModel][osName][osVersion][browserName][browserVersion]) {
-        deviceListClone[today.stringDate][today.currentTime][deviceName][deviceModel][osName][osVersion][browserName][browserVersion] = 0;
-    }
-
-    // Increment a new visit for the device
-    deviceListClone[today.stringDate][today.currentTime][deviceName][deviceModel][osName][osVersion][browserName][browserVersion] += 1;
-
-    return deviceListClone;
+    return objectTools.createNestedObject(devicesPage, devicesObjectStructure, currentDeviceVisits + 1);
 }
 
 /**
@@ -85,23 +61,17 @@ function updateDeviceVisit(today, devicesPage, pageData) {
  * @returns {object} Countries visit updated
  */
 function updateCountriesVisit(today, countries, pageData) {
-    const countryVisit = pageDataHelper.getCountry(pageData);
+    const countryCodeVisit = pageDataHelper.getCountry(pageData);
+    const countryObjectStructure = [
+        today.stringDate,
+        today.currentTime,
+        countryCodeVisit
+    ];
 
-    if (!countries[today.stringDate]) {
-        countries[today.stringDate] = {};
-    }
+    const currentCountyVisits = objectTools.getValueFromNestedObject(countries, countryObjectStructure, 0);
 
-    if (!countries[today.stringDate][today.currentTime]) {
-        countries[today.stringDate][today.currentTime] = {};
-    }
 
-    if (!countries[today.stringDate][today.currentTime][countryVisit]) {
-        countries[today.stringDate][today.currentTime][countryVisit] = 0;
-    }
-
-    countries[today.stringDate][today.currentTime][countryVisit] += 1;
-
-    return countries;
+    return objectTools.createNestedObject(countries, countryObjectStructure, currentCountyVisits + 1);
 }
 
 /**
@@ -113,22 +83,15 @@ function updateCountriesVisit(today, countries, pageData) {
  * @returns {object} User visit updated
  */
 function updateUserVisit(today, userVisits, userID) {
+    const usersObjectStructure = [
+        today.stringDate,
+        today.currentTime,
+        userID
+    ];
 
-    if (!userVisits[today.stringDate]) {
-        userVisits[today.stringDate] = {};
-    }
+    const currentUserVisits = objectTools.getValueFromNestedObject(userVisits, usersObjectStructure, 0);
 
-    if (!userVisits[today.stringDate][today.currentTime]) {
-        userVisits[today.stringDate][today.currentTime] = {};
-    }
-
-    if (!userVisits[today.stringDate][today.currentTime][userID]) {
-        userVisits[today.stringDate][today.currentTime][userID] = 0;
-    }
-
-    userVisits[today.stringDate][today.currentTime][userID] += 1;
-
-    return userVisits;
+    return objectTools.createNestedObject(userVisits, usersObjectStructure, currentUserVisits + 1);
 }
 
 
@@ -183,7 +146,6 @@ function updateAvailabilityInfo(today, availabilityData, pageData) {
 
     availabilityData[today.stringDate][today.currentTime].push(availabilityRoomsInfo.value);
 
-    return availabilityData;
 }
 
 /**
@@ -194,42 +156,15 @@ function updateAvailabilityInfo(today, availabilityData, pageData) {
  * @returns {object} Visits updated
  */
 function updateTotalVisits(today, metricVisits) {
-    // metricVisits = workerHelper.initializerMetricDateTime(today, metricVisits, 0);
 
-    if (!metricVisits[today.stringDate]) {
-        metricVisits[today.stringDate] = {};
-    }
+    const visitsObjectStructure = [
+        today.stringDate,
+        today.currentTime
+    ];
 
-    if (!metricVisits[today.stringDate][today.currentTime]) {
-        metricVisits[today.stringDate][today.currentTime] = 0;
-    }
+    const currentTotalVisits = objectTools.getValueFromNestedObject(metricVisits, visitsObjectStructure, 0);
 
-    metricVisits[today.stringDate][today.currentTime] += 1;
-
-    return metricVisits;
-}
-
-/**
- * Update all visits in a hour for a day
- *
- * @param {object} today
- * @param {object} metricHours
- * @returns {object} Hours visits updated
- */
-function updateHoursVisits(today, metricHours) {
-
-    if (!metricHours[today.stringDate]) {
-        metricHours[today.stringDate] = {};
-    }
-
-    if (!metricHours[today.stringDate][today.currentTime]) {
-        metricHours[today.stringDate][today.currentTime] = 0;
-    }
-
-
-    metricHours[today.stringDate][today.currentTime] += 1;
-
-    return metricHours;
+    return objectTools.createNestedObject(metricVisits, visitsObjectStructure, currentTotalVisits + 1);
 }
 
 /**
@@ -240,22 +175,17 @@ function updateHoursVisits(today, metricHours) {
  * @returns {object} Hours visits updated
  */
 function updatePreviousURLVisits(today, metricURLs, pageData) {
+
     const previousUrl = pageDataHelper.getPreviousUrl(pageData);
     const previousUrlFormated = previousUrl.replaceAll('.', '#');
 
-    if (!metricURLs[today.stringDate]) {
-        metricURLs[today.stringDate] = {};
-    }
+    const previousUrlObjectStructure = [
+        today.stringDate,
+        today.currentTime,
+        previousUrlFormated
+    ];
 
-    if (!metricURLs[today.stringDate][today.currentTime]) {
-        metricURLs[today.stringDate][today.currentTime] = {};
-    }
+    const currentpreviousUrlVisits = objectTools.getValueFromNestedObject(metricURLs, previousUrlObjectStructure, 0);
 
-    if (!metricURLs[today.stringDate][today.currentTime][previousUrlFormated]) {
-        metricURLs[today.stringDate][today.currentTime][previousUrlFormated] = 0;
-    }
-
-    metricURLs[today.stringDate][today.currentTime][previousUrlFormated] += 1;
-
-    return metricURLs;
+    return objectTools.createNestedObject(metricURLs, previousUrlObjectStructure, currentpreviousUrlVisits + 1);
 }

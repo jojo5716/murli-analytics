@@ -7,7 +7,6 @@ module.exports = (function modelSchema() {
         metaData: { type: Object },
         actions: { type: Object, default: {} },
         previousUrl: { type: Object, required: true },
-        atHours: { type: Object, required: true },
         users: { type: Object, required: true },
         visits: { type: Object, required: true },
         url: { type: String, required: true },

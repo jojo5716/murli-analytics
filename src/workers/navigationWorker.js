@@ -35,6 +35,8 @@ async function accumulateMetricsPageVisit(pageData, done) {
 
     // Get page type (content, availability, no-availability...)
     const pageType = getTypeSeccionPage(url);
+
+    // Query to find metric object
     const metricQuery = {
         month: currentMonth,
         year: currentYear,

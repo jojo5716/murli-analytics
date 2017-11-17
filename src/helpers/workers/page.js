@@ -3,11 +3,9 @@ const timeHelper = require('../../helpers/time');
 const workerUpdater = require('../../helpers/workers/updaters');
 
 
-
 module.exports = {
     generateNewPageVisit,
-    updateMetricPageContent,
-    initializerMetricDateTime
+    updateMetricPageContent
 };
 
 /**
@@ -34,7 +32,6 @@ function generateBasicMetricPageSchema(url) {
         url,
         visits: {},
         users: {},
-        atHours: {},
         previousUrl: {},
         devices: {},
         countries: {},
@@ -44,18 +41,6 @@ function generateBasicMetricPageSchema(url) {
     }
 }
 
-function initializerMetricDateTime(today, metricObject, timeValue) {
-    if (!metricObject[today.stringDate]) {
-        metricObject[today.stringDate] = 0;
-    }
-
-    if (!metricObject[today.stringDate][today.currentTime]) {
-        metricObject[today.stringDate][today.currentTime] = timeValue;
-    }
-
-    return metricObject;
-
-}
 
 /**
  * Update a page visit metric
@@ -72,7 +57,6 @@ function updateMetricPageContent(metricPage, pageData) {
     };
 
     metricPage.visits = workerUpdater.updateTotalVisits(today, metricPage.visits);
-    metricPage.atHours = workerUpdater.updateHoursVisits(today, metricPage.atHours);
     metricPage.previousUrl = workerUpdater.updatePreviousURLVisits(today, metricPage.previousUrl, pageData);
 
     metricPage.users = workerUpdater.updateUserVisit(today, metricPage.users, pageData.userID);
