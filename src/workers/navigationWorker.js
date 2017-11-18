@@ -48,17 +48,10 @@ async function accumulateMetricsPageVisit(pageData, done) {
 
     if (!metric) {
         const metricPage = generateNewPageVisit(pageData);
-        const pageVisitModel = await navigationWorkerService.createPageVisit(metricPage);
+        // Adding new page visit to the query object
+        metricQuery.pages = await navigationWorkerService.createPageVisit(metricPage);
 
-        const metricObj = {
-            project,
-            type: pageType,
-            pages: [pageVisitModel],
-            month: currentMonth,
-            year: currentYear
-        };
-
-        navigationWorkerService.create(metricObj);
+        navigationWorkerService.createPageMetric(metricQuery);
     } else {
         const indexPage = metric.pages.findIndex(each => each.url === url);
 

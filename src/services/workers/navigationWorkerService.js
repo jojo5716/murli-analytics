@@ -3,7 +3,7 @@ const pageVisitSchema = require('../../models/metrics/pageVisitSchema');
 
 
 module.exports = {
-    create,
+    createPageMetric,
     createPageVisit,
     updatePage,
     findPageVisitByURL,
@@ -23,7 +23,7 @@ async function findMetricRowByQuery(query) {
  * @param {object} args
  * @returns {object} Metric page
  */
-async function create(args) {
+async function createPageMetric(args) {
     return await pageMetricSchema.create(args);
 }
 
