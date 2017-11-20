@@ -102,28 +102,18 @@ function updateUserVisit(keysPath, userVisits, userID) {
 function updateMetaDatasAttr(keysPath, metricMetaData, pageData) {
     const metaDatas = pageData.data.metaData;
 
+
     for (let i = 0; i < metaDatas.length; i += 1) {
         const metaData = metaDatas[i];
         const metaDataName = metaData.key.replaceAll('.', '#');
         const metaDataValue = metaData.value.replaceAll('.', '#');;
 
-        if (!metricMetaData[keysPath[0]]) {
-            metricMetaData[keysPath[0]] = {};
-        }
+        let keysPathClone = keysPath.slice(0);
 
-        if (!metricMetaData[keysPath[0]][keysPath[1]]) {
-            metricMetaData[keysPath[0]][keysPath[1]] = {};
-        }
-
-        if (!metricMetaData[keysPath[0]][keysPath[1]][metaDataName]) {
-            metricMetaData[keysPath[0]][keysPath[1]][metaDataName] = {};
-        }
-
-        if (!metricMetaData[keysPath[0]][keysPath[1]][metaDataName][metaDataValue]) {
-            metricMetaData[keysPath[0]][keysPath[1]][metaDataName][metaDataValue] = 0;
-        }
-
-        metricMetaData[keysPath[0]][keysPath[1]][metaDataName][metaDataValue] += 1;
+        keysPathClone = keysPathClone.concat([metaDataName, metaDataValue]);
+        const currentMetaDataValue = objectTools.getValueFromNestedObject(metricMetaData, keysPathClone, 0);
+        // Updating metadata values
+        objectTools.createNestedObject(metricMetaData, keysPathClone, currentMetaDataValue + 1);
     }
 
     return metricMetaData;
@@ -133,16 +123,13 @@ function updateAvailabilityInfo(keysPath, availabilityData, pageData) {
     const availabilityRoomsInfo = pageData.data.availability[0];
 
     if (availabilityRoomsInfo) {
-        if (!availabilityData[keysPath[0]]) {
-            availabilityData[keysPath[1]] = {};
-        }
+        const currentAvailabilities = objectTools.getValueFromNestedObject(availabilityData, keysPath, []);
+        currentAvailabilities.push(availabilityRoomsInfo.value);
 
-        if (!availabilityData[keysPath[0]][keysPath[1]]) {
-            availabilityData[keysPath[0]][keysPath[1]] = [];
-        }
-
-        availabilityData[keysPath[0]][keysPath[1]].push(availabilityRoomsInfo.value);
+        return objectTools.createNestedObject(availabilityData, keysPath, currentAvailabilities);
     }
+
+
 }
 
 /**
@@ -163,6 +150,7 @@ function updateTotalVisits(keysPath, metricVisits) {
  *
  * @param {array} keysPath
  * @param {object} metricURLs
+ * @param {object} pageData
  * @returns {object} Hours visits updated
  */
 function updatePreviousURLVisits(keysPath, metricURLs, pageData) {
