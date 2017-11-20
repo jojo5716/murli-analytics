@@ -16,15 +16,15 @@ module.exports = {
 /**
  * Update an object of devices visits
  *
- * @param {object} today date
+ * @param {array} keysPath
  * @param {object} devicesPage
  * @param {object} pageData
  * @returns {object} Devices visits
  */
-function updateDeviceVisit(today, devicesPage, pageData) {
+function updateDeviceVisit(keysPath, devicesPage, pageData) {
     const userAgent = pageDataHelper.getUserAgent(pageData);
     const userAgentInfo = getUserAgentInfo(userAgent);
-
+    let keyPathClone = keysPath.slice(0);
     // Getting all browser and os info
 
     const {
@@ -37,8 +37,6 @@ function updateDeviceVisit(today, devicesPage, pageData) {
     } = userAgentDeviceInfo(userAgentInfo);
 
     const devicesObjectStructure = [
-        today.stringDate,
-        today.currentTime,
         deviceName,
         deviceModel,
         osName,
@@ -47,63 +45,61 @@ function updateDeviceVisit(today, devicesPage, pageData) {
         browserVersion
     ];
 
-    const currentDeviceVisits = objectTools.getValueFromNestedObject(devicesPage, devicesObjectStructure, 0);
+    keyPathClone = keyPathClone.concat(devicesObjectStructure);
 
-    return objectTools.createNestedObject(devicesPage, devicesObjectStructure, currentDeviceVisits + 1);
+    const currentDeviceVisits = objectTools.getValueFromNestedObject(devicesPage, keyPathClone, 0);
+
+    return objectTools.createNestedObject(devicesPage, keyPathClone, currentDeviceVisits + 1);
 }
 
 /**
  * Update countries visits for page visit metric
  *
- * @param {object} today date
+ * @param {array} keysPath
  * @param {object} countries
  * @param {object} pageData
  * @returns {object} Countries visit updated
  */
-function updateCountriesVisit(today, countries, pageData) {
+function updateCountriesVisit(keysPath, countries, pageData) {
     const countryCodeVisit = pageDataHelper.getCountry(pageData);
-    const countryObjectStructure = [
-        today.stringDate,
-        today.currentTime,
-        countryCodeVisit
-    ];
+    const keyPathClone = keysPath.slice(0);
 
-    const currentCountyVisits = objectTools.getValueFromNestedObject(countries, countryObjectStructure, 0);
+    keyPathClone.push(countryCodeVisit);
+    const currentCountyVisits = objectTools.getValueFromNestedObject(countries, keyPathClone, 0);
 
 
-    return objectTools.createNestedObject(countries, countryObjectStructure, currentCountyVisits + 1);
+    return objectTools.createNestedObject(countries, keyPathClone, currentCountyVisits + 1);
 }
 
 /**
  * Update users visits for page visit metric
  *
- * @param {object} today date
+ * @param {array} keysPath
  * @param {object} userVisits
  * @param {string} userID
  * @returns {object} User visit updated
  */
-function updateUserVisit(today, userVisits, userID) {
-    const usersObjectStructure = [
-        today.stringDate,
-        today.currentTime,
-        userID
-    ];
+function updateUserVisit(keysPath, userVisits, userID) {
+    const keyPathClone = keysPath.slice(0);
 
-    const currentUserVisits = objectTools.getValueFromNestedObject(userVisits, usersObjectStructure, 0);
+    // Adding user id to nested object
+    keyPathClone.push(userID);
 
-    return objectTools.createNestedObject(userVisits, usersObjectStructure, currentUserVisits + 1);
+    const currentUserVisits = objectTools.getValueFromNestedObject(userVisits, keyPathClone, 0);
+
+    return objectTools.createNestedObject(userVisits, keyPathClone, currentUserVisits + 1);
 }
 
 
 /**
  * Update all metaData metrics into a page visit metric like attrs of the own object
  *
- * @param {object} today date
+ * @param {array} keysPath
  * @param {object} metricMetaData
  * @param {object} pageData
  * @returns {object} Metadata object
  */
-function updateMetaDatasAttr(today, metricMetaData, pageData) {
+function updateMetaDatasAttr(keysPath, metricMetaData, pageData) {
     const metaDatas = pageData.data.metaData;
 
     for (let i = 0; i < metaDatas.length; i += 1) {
@@ -111,81 +107,72 @@ function updateMetaDatasAttr(today, metricMetaData, pageData) {
         const metaDataName = metaData.key.replaceAll('.', '#');
         const metaDataValue = metaData.value.replaceAll('.', '#');;
 
-        if (!metricMetaData[today.stringDate]) {
-            metricMetaData[today.stringDate] = {};
+        if (!metricMetaData[keysPath[0]]) {
+            metricMetaData[keysPath[0]] = {};
         }
 
-        if (!metricMetaData[today.stringDate][today.currentTime]) {
-            metricMetaData[today.stringDate][today.currentTime] = {};
+        if (!metricMetaData[keysPath[0]][keysPath[1]]) {
+            metricMetaData[keysPath[0]][keysPath[1]] = {};
         }
 
-        if (!metricMetaData[today.stringDate][today.currentTime][metaDataName]) {
-            metricMetaData[today.stringDate][today.currentTime][metaDataName] = {};
+        if (!metricMetaData[keysPath[0]][keysPath[1]][metaDataName]) {
+            metricMetaData[keysPath[0]][keysPath[1]][metaDataName] = {};
         }
 
-        if (!metricMetaData[today.stringDate][today.currentTime][metaDataName][metaDataValue]) {
-            metricMetaData[today.stringDate][today.currentTime][metaDataName][metaDataValue] = 0;
+        if (!metricMetaData[keysPath[0]][keysPath[1]][metaDataName][metaDataValue]) {
+            metricMetaData[keysPath[0]][keysPath[1]][metaDataName][metaDataValue] = 0;
         }
 
-        metricMetaData[today.stringDate][today.currentTime][metaDataName][metaDataValue] += 1;
+        metricMetaData[keysPath[0]][keysPath[1]][metaDataName][metaDataValue] += 1;
     }
 
     return metricMetaData;
 }
 
-function updateAvailabilityInfo(today, availabilityData, pageData) {
+function updateAvailabilityInfo(keysPath, availabilityData, pageData) {
     const availabilityRoomsInfo = pageData.data.availability[0];
 
-    if (!availabilityData[today.stringDate]) {
-        availabilityData[today.stringDate] = {};
+    if (availabilityRoomsInfo) {
+        if (!availabilityData[keysPath[0]]) {
+            availabilityData[keysPath[1]] = {};
+        }
+
+        if (!availabilityData[keysPath[0]][keysPath[1]]) {
+            availabilityData[keysPath[0]][keysPath[1]] = [];
+        }
+
+        availabilityData[keysPath[0]][keysPath[1]].push(availabilityRoomsInfo.value);
     }
-
-    if (!availabilityData[today.stringDate][today.currentTime]) {
-        availabilityData[today.stringDate][today.currentTime] = [];
-    }
-
-    availabilityData[today.stringDate][today.currentTime].push(availabilityRoomsInfo.value);
-
 }
 
 /**
  * Update all visits for a day
  *
- * @param {object} today
+ * @param {array} keysPath
  * @param {object} metricVisits
  * @returns {object} Visits updated
  */
-function updateTotalVisits(today, metricVisits) {
+function updateTotalVisits(keysPath, metricVisits) {
+    const currentTotalVisits = objectTools.getValueFromNestedObject(metricVisits, keysPath, 0);
 
-    const visitsObjectStructure = [
-        today.stringDate,
-        today.currentTime
-    ];
-
-    const currentTotalVisits = objectTools.getValueFromNestedObject(metricVisits, visitsObjectStructure, 0);
-
-    return objectTools.createNestedObject(metricVisits, visitsObjectStructure, currentTotalVisits + 1);
+    return objectTools.createNestedObject(metricVisits, keysPath, currentTotalVisits + 1);
 }
 
 /**
  * Update all previous url visits in a day
  *
- * @param {object} today
+ * @param {array} keysPath
  * @param {object} metricURLs
  * @returns {object} Hours visits updated
  */
-function updatePreviousURLVisits(today, metricURLs, pageData) {
-
+function updatePreviousURLVisits(keysPath, metricURLs, pageData) {
     const previousUrl = pageDataHelper.getPreviousUrl(pageData);
     const previousUrlFormated = previousUrl.replaceAll('.', '#');
+    const keyPathClone = keysPath.slice(0);
 
-    const previousUrlObjectStructure = [
-        today.stringDate,
-        today.currentTime,
-        previousUrlFormated
-    ];
+    keyPathClone.push(previousUrlFormated);
 
-    const currentpreviousUrlVisits = objectTools.getValueFromNestedObject(metricURLs, previousUrlObjectStructure, 0);
+    const currentpreviousUrlVisits = objectTools.getValueFromNestedObject(metricURLs, keyPathClone, 0);
 
-    return objectTools.createNestedObject(metricURLs, previousUrlObjectStructure, currentpreviousUrlVisits + 1);
+    return objectTools.createNestedObject(metricURLs, keyPathClone, currentpreviousUrlVisits + 1);
 }

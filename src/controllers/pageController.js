@@ -6,10 +6,8 @@ const userService = require('../services/userService');
 const navigationService = require('../services/navigationService');
 
 const { mergePageInfo } = require('../helpers/page');
-const navigationWorkerService = require('../services/workers/navigationWorkerService');
 const workerJobs = require('../jobs/index');
 
-const queue = kue.createQueue();
 
 module.exports = {
     /**
@@ -106,4 +104,4 @@ module.exports = {
 
         res.json({ success: true });
     }
-}
+};

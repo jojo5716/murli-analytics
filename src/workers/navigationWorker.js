@@ -44,28 +44,56 @@ async function accumulateMetricsPageVisit(pageData, done) {
         project,
     };
 
+    const pathKeys = [
+        timeHelper.getTodayHumanDate(),
+    ];
+
+    const pathDetailKeys = [
+        timeHelper.getTodayHumanDate(),
+        timeHelper.getCurrentTime()
+    ];
+
     const metric = await navigationWorkerService.findMetricRowByQuery(metricQuery);
 
     if (!metric) {
-        const metricPage = generateNewPageVisit(pageData);
+        const metricDetailPage = generateNewPageVisit(pageData, pathDetailKeys);
+
+        const metricPage = generateNewPageVisit(pageData, pathKeys);
+
         // Adding new page visit to the query object
         metricQuery.pages = await navigationWorkerService.createPageVisit(metricPage);
+        metricQuery.detailPages = await navigationWorkerService.createDetailPageVisit(metricDetailPage);
 
         navigationWorkerService.createPageMetric(metricQuery);
     } else {
         const indexPage = metric.pages.findIndex(each => each.url === url);
+        const indexDetailPage = metric.detailPages.findIndex(each => each.url === url);
 
         if (indexPage !== -1) {
             // Update
             const currentPage = metric.pages[indexPage];
-            const pageVisitUpdated = updateMetricPageContent(currentPage, pageData);
+            const pageVisitUpdated = await updateMetricPageContent(currentPage, pageData, pathKeys);
+
             await navigationWorkerService.updatePage(url, pageVisitUpdated);
         } else {
             // New page visit
-            const metricPage = generateNewPageVisit(pageData);
+            const metricPage = generateNewPageVisit(pageData, pathKeys);
             const pageVisitModel = await navigationWorkerService.createPageVisit(metricPage);
 
             metric.pages.push(pageVisitModel);
+            metric.save();
+        }
+
+        // Detail pages...
+        if (indexDetailPage !== -1) {
+            const currentPage = metric.detailPages[indexPage];
+            const pageDetailVisitUpdated = updateMetricPageContent(currentPage, pageData, pathDetailKeys);
+            await navigationWorkerService.updateDetailPage(url, pageDetailVisitUpdated);
+
+        } else {
+            const metricDetailPage = generateNewPageVisit(pageData, pathDetailKeys);
+            const pageDetailVisitModel = await navigationWorkerService.createDetailPageVisit(metricDetailPage);
+            metric.detailPages.push(pageDetailVisitModel);
             metric.save();
         }
     }
