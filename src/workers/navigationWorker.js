@@ -86,13 +86,15 @@ async function accumulateMetricsPageVisit(pageData, done) {
 
         // Detail pages...
         if (indexDetailPage !== -1) {
-            const currentPage = metric.detailPages[indexPage];
+            const currentPage = metric.detailPages[indexDetailPage];
             const pageDetailVisitUpdated = updateMetricPageContent(currentPage, pageData, pathDetailKeys);
+
             await navigationWorkerService.updateDetailPage(url, pageDetailVisitUpdated);
 
         } else {
             const metricDetailPage = generateNewPageVisit(pageData, pathDetailKeys);
             const pageDetailVisitModel = await navigationWorkerService.createDetailPageVisit(metricDetailPage);
+
             metric.detailPages.push(pageDetailVisitModel);
             metric.save();
         }
