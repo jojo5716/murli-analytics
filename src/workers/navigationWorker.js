@@ -71,8 +71,14 @@ async function accumulateMetricsPageVisit(pageData, done) {
 
         if (indexPage !== -1) {
             // Update
+            console.log("-------------START Update page visit ----------");
+
             const currentPage = metric.pages[indexPage];
+            console.log("METRIC");
+            console.log(metric);
+            console.log(`indexPage: ${indexPage}`);
             const pageVisitUpdated = await updateMetricPageContent(currentPage, pageData, pathKeys);
+            console.log("-------------END Update page visit ----------");
 
             await navigationWorkerService.updatePage(url, pageVisitUpdated);
         } else {
@@ -86,9 +92,15 @@ async function accumulateMetricsPageVisit(pageData, done) {
 
         // Detail pages...
         if (indexDetailPage !== -1) {
+            console.log("-------------START Update detail page visit ----------");
+
             const currentPage = metric.detailPages[indexPage];
+            console.log("METRIC");
+            console.log(metric);
+            console.log(`indexPage: ${indexPage}`);
             const pageDetailVisitUpdated = updateMetricPageContent(currentPage, pageData, pathDetailKeys);
             await navigationWorkerService.updateDetailPage(url, pageDetailVisitUpdated);
+            console.log("-------------END Update detail page visit ----------");
 
         } else {
             const metricDetailPage = generateNewPageVisit(pageData, pathDetailKeys);
