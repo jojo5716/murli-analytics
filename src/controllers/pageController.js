@@ -95,8 +95,9 @@ module.exports = {
 
     deleteAllJobs: (req, res) => {
         const jobName = req.query.jobName || 'active';
+        const sizeJobsDelete = req.query.sizeJobs || 2000;
 
-        kue.Job.rangeByState(jobName, 0, 2000, 'asc', function (err, jobs) {
+        kue.Job.rangeByState(jobName, 0, sizeJobsDelete, 'asc', function (err, jobs) {
             jobs.forEach(function (job) {
                 job.remove(function () {
                     console.log('removed ', job.id);
