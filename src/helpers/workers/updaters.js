@@ -40,9 +40,9 @@ function updateDeviceVisit(keysPath, devicesPage, pageData) {
         deviceName,
         deviceModel,
         osName,
-        osVersion,
+        osVersion.replaceAll('.', '#'),
         browserName,
-        browserVersion
+        browserVersion.replaceAll('.', '#')
     ];
 
     keyPathClone = keyPathClone.concat(devicesObjectStructure);
