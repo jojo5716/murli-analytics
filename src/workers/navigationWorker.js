@@ -12,7 +12,9 @@ const {
 
 const workerActionUpdater = {
     'change currency': workerActionHelper.saveChangeCurrencyAction,
-    'add room': workerActionHelper.saveAddRoomAction
+    'add room': workerActionHelper.saveRoomActions,
+    'delete room': workerActionHelper.saveRoomActions,
+    'delete package': workerActionHelper.saveDeletePacksAction
 };
 
 module.exports = {
@@ -126,13 +128,10 @@ async function accumulateMetricsPageActions(pageData, done) {
         }
 
         await navigationWorkerService.updatePage(url, page);
-
     }
 
     done();
 }
-
-
 
 
 async function accumulateMetricsBookings(navigationData, done) {
