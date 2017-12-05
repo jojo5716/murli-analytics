@@ -29,6 +29,7 @@ function accumulateMetricsPageVisit(userID, pageData) {
 
     queue
         .create('accumulateMetricsPageVisit', pageDataClone)
+        .attempts(5)
         .save()
 }
 
@@ -41,5 +42,6 @@ function accumulateMetricsPageVisit(userID, pageData) {
 function accumulateMetricsPageActions(pageData) {
     queue
         .create('accumulateMetricsPageActions', pageData)
+        .attempts(5)
         .save()
 }

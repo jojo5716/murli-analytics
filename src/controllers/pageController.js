@@ -94,13 +94,28 @@ module.exports = {
     },
 
     deleteAllJobs: (req, res) => {
-        const jobName = req.query.jobName || 'active';
+        const jobName = req.query.jobName || 'complete';
         const sizeJobsDelete = req.query.sizeJobs || 2000;
 
         kue.Job.rangeByState(jobName, 0, sizeJobsDelete, 'asc', function (err, jobs) {
             jobs.forEach(function (job) {
                 job.remove(function () {
                     console.log('removed ', job.id);
+                });
+            });
+        });
+
+        res.json({ success: true });
+    },
+
+    resumeAllJobs: (req, res) => {
+        const queue = kue.createQueue();
+
+        queue.active( function( err, ids ) {
+            ids.forEach( function( id ) {
+                kue.Job.get( id, function( err, job ) {
+                    console.log(`JOB ID: ${id}`);
+                    job.inactive();
                 });
             });
         });
