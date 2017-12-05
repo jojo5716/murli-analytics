@@ -9,7 +9,8 @@ module.exports = (app) => {
     app.post('/actions', pageController.saveAction);
     app.post('/track', pageController.trackPage);
     app.get('/delete-jobs', pageController.deleteAllJobs);
-    app.get('/resume-jobs', pageController.resumeAllJobs);
+    app.get('/resume-active-jobs', pageController.resumeActiveJobs);
+    app.get('/resume-inactive-jobs', pageController.resumeInactiveJobs);
 
     // API Rest
 

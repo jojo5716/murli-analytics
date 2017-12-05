@@ -108,7 +108,7 @@ module.exports = {
         res.json({ success: true });
     },
 
-    resumeAllJobs: (req, res) => {
+    resumeActiveJobs: (req, res) => {
         const queue = kue.createQueue();
 
         queue.active( function( err, ids ) {
@@ -121,5 +121,20 @@ module.exports = {
         });
 
         res.json({ success: true });
-    }
+    },
+
+    resumeInactiveJobs: (req, res) => {
+        const queue = kue.createQueue();
+
+        queue.inactive( function( err, ids ) {
+            ids.forEach( function( id ) {
+                kue.Job.get( id, function( err, job ) {
+                    console.log(`JOB ID: ${id}`);
+                    job.inactive();
+                });
+            });
+        });
+
+        res.json({ success: true });
+    },
 };
