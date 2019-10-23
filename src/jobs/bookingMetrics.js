@@ -1,6 +1,7 @@
 const kue = require('kue');
+const config = require('../../config');
 
-const queue = kue.createQueue();
+const queue = kue.createQueue({ redis: config.redisPath });
 
 module.exports = {
     accumulateMetricsBookings

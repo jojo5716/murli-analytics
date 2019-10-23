@@ -1,4 +1,0 @@
-{
-    "dbPath": "mongodb://localhost/murli-analytics2",
-    "port": 8000
-}

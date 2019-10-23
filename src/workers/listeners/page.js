@@ -4,8 +4,9 @@ const {
     accumulateMetricsPageActions,
     accumulateMetricsBookings
 } = require('../navigationWorker');
+const config = require('../../../config');
 
-const queue = kue.createQueue();
+const queue =  kue.createQueue({ redis: config.redisPath });
 
 
 queue.process('accumulateMetricsPageVisit', 2, (job, done) => {

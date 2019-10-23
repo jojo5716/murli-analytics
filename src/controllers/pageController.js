@@ -7,6 +7,7 @@ const navigationService = require('../services/navigationService');
 
 const { mergePageInfo } = require('../helpers/page');
 const workerJobs = require('../jobs/index');
+const config = require("../../config");
 
 
 module.exports = {
@@ -109,7 +110,7 @@ module.exports = {
     },
 
     resumeActiveJobs: (req, res) => {
-        const queue = kue.createQueue();
+        const queue = kue.createQueue({ redis: config.redisPath });
 
         queue.active( function( err, ids ) {
             ids.forEach( function( id ) {
@@ -124,7 +125,7 @@ module.exports = {
     },
 
     resumeInactiveJobs: (req, res) => {
-        const queue = kue.createQueue();
+        const queue = kue.createQueue({ redis: config.redisPath });
 
         queue.inactive( function( err, ids ) {
             ids.forEach( function( id ) {
