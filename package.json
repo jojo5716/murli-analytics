@@ -21,7 +21,7 @@
     "restify": "^6.3.2",
     "restify-cors-middleware": "^1.0.1",
     "restify-plugins": "^1.6.0",
-    "ua-parser-js": "^0.7.17",
+    "ua-parser-js": "^0.7.24",
     "uuid": "^3.0.1"
   },
   "devDependencies": {
